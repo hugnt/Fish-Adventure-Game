@@ -12,7 +12,7 @@ public class Panel extends JPanel{
 	private Game game;
 	private int width,height;
 	private BufferedImage background;
-	private final String BG_URL = "bg4.png";
+	private final String BG_URL = "bg05.jpg";
 		
 	public Panel(Game game, int width, int height) {
 		super();

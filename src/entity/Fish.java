@@ -24,10 +24,14 @@ public class Fish{
 	private final float denta = 2.0f;
 	
 	//Collision
+	private MoveHandler moveHandler;
 	private Rectangle2D.Float hitbox;
 	private int[][] mapData;
 	private float xOffset = 20 * Game.SCALE;
 	private float yOffset = 12 * Game.SCALE;
+	
+	//Key lock 
+	private boolean isUnlock; 
 	
 	public Fish(float x, float y, float width, float height, String color) {
 		super();
@@ -41,6 +45,8 @@ public class Fish{
 		String fishColor = getFishColor(color);
 		fishImg = IOHandler.getImage(fishColor);
 		fishImg = fishImg.getSubimage(12, 20, 40, 26);
+		
+		moveHandler = new MoveHandler();
 	}
 	
 	private String getFishColor(String color) {
@@ -64,12 +70,19 @@ public class Fish{
 		if (up && !down) dentaY -= denta;
 		else if (down && !up) dentaY += denta;
 		
-		if(MoveHandler.isValidStep(hitbox.x + dentaX, hitbox.y + dentaY, hitbox.width, hitbox.height, mapData)) {
+
+		//checklock
+		if(moveHandler.isValidStep(hitbox.x + dentaX, hitbox.y + dentaY, hitbox.width, hitbox.height, mapData, isUnlock)) {
 			hitbox.x += dentaX;
 			hitbox.y += dentaY;
 		}
 		
 	}
+	
+	public void updateLockStatus(boolean isUnclock) {
+		this.isUnlock = isUnlock;
+	}
+	
 	
 	
 

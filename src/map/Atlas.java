@@ -1,17 +1,27 @@
+
 package map;
+import java.util.*;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 import main.Game;
 import root.IOHandler;
+import root.Pair;
 
 public class Atlas {
 	
 	private int[][] mapData;
 	private BufferedImage[] mapSprites;
-	private final String SPRITES_URL = "map_sprites3.png"; 
-	private final String MAP_URL = "map004.png"; 
+	private final String SPRITES_URL = "map_sprites05.png"; 
+	private final String MAP_URL = "map005.png"; 
+	
+	
+	//other objects
+	private int posLockX;
+	private int posLockY;
+	private ArrayList<Pair<Integer, Integer>> lstPosQuestion;
+	
 	
 	public Atlas() {
 		importMapSprites();
@@ -44,21 +54,39 @@ public class Atlas {
 		
 		mapData = new int[img.getHeight()][img.getWidth()];
 		
+		lstPosQuestion = new ArrayList<Pair<Integer, Integer>>();
+		int flag = 0;
+		
 		for (int i = 0; i < img.getHeight(); i++) {
 			for (int j = 0; j < img.getWidth(); j++) {
 				Color color = new Color(img.getRGB(j, i));//get per pixel tile's color of img
 				int value = color.getRed();
-				if(value >= 49) value = 6;
+				System.out.println("value: "+value);
+				if(value >= 49)
+				{
+					value = 6;
+				}
+				
+				//lock
+				if(value == 18&& flag == 0) {
+//					System.out.println("pos: "+j+", "+i);
+					flag = 1;
+					posLockX = j;
+					posLockY = i;
+				}
+				
+				//question
+				if(value == 19) {
+					lstPosQuestion.add(new Pair(j, i));
+				}
+				
 				//just save the color red like a spriteID 
 				mapData[i][j] = value;
 			}
 		}
 	}
 	
-	public int getSpriteIndex(int x, int y) {
-		return mapData[y][x];
-	}
-	
+
 	
 	public void render(Graphics g, int xMapOffset) {
 		for (int i = 0; i < Game.TILES_IN_HEIGHT; i++) {
@@ -68,8 +96,25 @@ public class Atlas {
 							Game.TILES_SIZE, Game.TILES_SIZE,null);
 			}
 		}
+		
 	}
 
+	public ArrayList<Pair<Integer, Integer>> getLstPosQuestion(){
+		return lstPosQuestion;
+	}
+	
+	public int getPosLockX() {
+		return posLockX;
+	}
+
+	public int getPosLockY() {
+		return posLockY;
+	}
+
+	public int getSpriteIndex(int x, int y) {
+		return mapData[y][x];
+	}
+	
 	public int[][] getMapData() {
 		return mapData;
 	}

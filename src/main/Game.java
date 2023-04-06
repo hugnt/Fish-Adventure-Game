@@ -1,10 +1,14 @@
 package main;
 
 import java.awt.Graphics;
+import java.util.*;
 
 import entity.Fish;
+import entity.Lock;
+import entity.Hint;
 import map.Atlas;
 import root.MoveHandler;
+import root.Pair;
 
 public class Game implements Runnable {
 
@@ -12,9 +16,12 @@ public class Game implements Runnable {
 	private Panel panel;
 	private Atlas map;
 	private Fish fish1, fish2;
+	private Lock lock;
+	private ArrayList<Hint> lstHint;
 
+	//config game
 	public final static int TILES_DEFAULT_SIZE = 32;
-	public final static float SCALE = 1f;
+	public final static float SCALE = 1.2f;
 	public final static int TILES_IN_WIDTH = 26;
 	public final static int TILES_IN_HEIGHT = 22;
 	public final static int TILES_SIZE = (int) (TILES_DEFAULT_SIZE * SCALE);
@@ -34,15 +41,36 @@ public class Game implements Runnable {
 	private int rightBorder = (int) (0.6 * GAME_WIDTH);
 	
 	
+	
 	public Game() {
 	};
 
 	public void start() {
 		map = new Atlas();
-		fish1 = new Fish(100, 200, 64*SCALE, 64*SCALE, "red");
-		fish2 = new Fish(100, 500, 64*SCALE, 64*SCALE, "blue");
+		fish1 = new Fish(100*SCALE, 200*SCALE, 64*SCALE, 64*SCALE, "red");
+		fish2 = new Fish(100*SCALE, 500*SCALE, 64*SCALE, 64*SCALE, "blue");
 		fish1.setMapData(map.getMapData());
 		fish2.setMapData(map.getMapData());
+		
+		String[] question = new String[] {
+			"The first character of key is S",
+			"The key contains character K",
+			"The key relevants to a big fish",
+			"The key contains character H",
+			"More than 30000 teaths",
+			"Living in the ocean",
+			"... Tank"
+		};
+		
+		lstHint = new ArrayList<Hint>();
+		int i =0;
+		for(var q: map.getLstPosQuestion()) {
+//			System.out.println(q.first+" "+q.second);
+			lstHint.add(new Hint(TILES_SIZE*q.first, TILES_SIZE*q.second,TILES_SIZE ,TILES_SIZE,question[i]));
+			i++;
+		}
+		lock = new Lock(TILES_SIZE*map.getPosLockX(), TILES_SIZE*map.getPosLockY(), TILES_SIZE*4, TILES_SIZE*2);
+		
 
 		panel = new Panel(this, GAME_WIDTH, GAME_HEIGHT);// create panel
 		screen = new Screen(panel);// Create window
@@ -66,8 +94,13 @@ public class Game implements Runnable {
 
 	public void render(Graphics g) {
 		map.render(g,xMapOffset);
+		for(var q: lstHint) {
+			q.render(g, xMapOffset);
+		}
+//		lock.render(g,xMapOffset);
 		fish1.render(g, xMapOffset);
 		fish2.render(g, xMapOffset);
+		
 	}
 	
 	public void extendMap() {
@@ -108,6 +141,8 @@ public class Game implements Runnable {
 			previousTime = currentTime;
 			
 			if(deltaF >= 1) {
+				fish1.updateLockStatus(lock.isUnlock());
+				fish2.updateLockStatus(lock.isUnlock());
 				fish1.updatePosition();
 				fish2.updatePosition();
 				extendMap();

@@ -10,8 +10,15 @@ import main.Panel;
 
 public class MoveHandler implements KeyListener {
 
-	Fish f1, f2;
-	Panel panel;
+	private Fish f1, f2;
+	private Panel panel;
+	
+	//spectial Object collition
+	private Pair<Integer, Integer> hintPos;  
+	
+	public MoveHandler() {
+		hintPos = new Pair<Integer, Integer> (0, 0);
+	}
 	
 	public MoveHandler(Fish f1, Fish f2,Panel panel) {
 		this.f1 = f1;
@@ -19,16 +26,16 @@ public class MoveHandler implements KeyListener {
 		this.panel = panel;
 	}
 	
-	public static boolean isValidStep(float x, float y, float width, float height, int[][] lvlData) {
+	public boolean isValidStep(float x, float y, float width, float height, int[][] lvlData, boolean isUnlock) {
 		//top-left
-		if(isValidPoint(x, y, lvlData)) {
+		if(isValidPoint(x, y, lvlData, isUnlock)) {
 			//bottom - right
-			if(isValidPoint(x + width, y + height, lvlData)) {
+			if(isValidPoint(x + width, y + height, lvlData,isUnlock)) {
 				//top - right
-				if(isValidPoint(x + width, y, lvlData)) {
+				if(isValidPoint(x + width, y, lvlData, isUnlock)) {
 					//bottom left
-					if(isValidPoint(x , y + height, lvlData)) {
-						System.out.println("FORTH: x: "+x +"y: "+y + height);
+					if(isValidPoint(x , y + height, lvlData, isUnlock)) {
+						//System.out.println("FORTH: x: "+x +"y: "+y + height);
 						return true;
 					}	
 				}
@@ -37,17 +44,18 @@ public class MoveHandler implements KeyListener {
 						
 		return false;
 	}
+
 	
-	
+
 	//check position
-	private static boolean isValidPoint(float x, float y, int[][] mapData) {
+	private boolean isValidPoint(float x, float y, int[][] mapData, boolean isUnlock) {
 		int maxWidth = mapData[0].length * Game.TILES_SIZE;
 		if(x < 0 || x >= maxWidth) {
-			System.out.println("x OUT OF Width" + Game.GAME_WIDTH );
+			//System.out.println("x OUT OF Width" + Game.GAME_WIDTH );
 			return false;
 		}
 		if(y < 0 || y >= Game.GAME_HEIGHT) {
-			System.out.println("y OUT OF Width" + Game.GAME_HEIGHT );
+			//System.out.println("y OUT OF Width" + Game.GAME_HEIGHT );
 			return false;
 		}
 		//if both above are false => Inside the game window -> continue checking the details position
@@ -55,12 +63,26 @@ public class MoveHandler implements KeyListener {
 		float yIndex = y / Game.TILES_SIZE;
 		
 		int value = mapData[(int)yIndex][(int)xIndex];
-//		System.out.println("Pos imgage: "+ value);
+		
+		//checkInHint
+		if(value == 19) {
+			hintPos = new Pair<Integer, Integer> ((int)xIndex, (int)yIndex);
+		};
 		if(value >= 48 || value < 0|| value != 6) {
-			System.out.println("index OUT OF Value" + value);
+			//System.out.println("index OUT OF Value" + value);
 			return false;
 		}
+		
+		//key lock check opening
+		if(value==18 && isUnlock==false) return false;
+		
 		return true;
+
+	}
+	
+	//getter & setter
+	public Pair<Integer, Integer> getHintPos() {
+		return hintPos;
 	}
 	
 	@Override
