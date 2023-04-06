@@ -21,6 +21,7 @@ public class Atlas {
 	private int posLockX;
 	private int posLockY;
 	private ArrayList<Pair<Integer, Integer>> lstPosQuestion;
+	private boolean unlock;
 	
 	
 	public Atlas() {
@@ -68,8 +69,7 @@ public class Atlas {
 				}
 				
 				//lock
-				if(value == 18&& flag == 0) {
-//					System.out.println("pos: "+j+", "+i);
+				if(value == 28&& flag == 0) {
 					flag = 1;
 					posLockX = j;
 					posLockY = i;
@@ -92,11 +92,21 @@ public class Atlas {
 		for (int i = 0; i < Game.TILES_IN_HEIGHT; i++) {
 			for (int j = 0; j < mapData[0].length; j++) {
 				int index = getSpriteIndex(j, i);
+				if(unlock==true) {
+					if(index == 28||index==29||index==30||index==31||index==35||index==36||index==37||index==38) {
+						index = 6;
+					}
+				}
 				g.drawImage(mapSprites[index], Game.TILES_SIZE * j - xMapOffset , Game.TILES_SIZE * i,
 							Game.TILES_SIZE, Game.TILES_SIZE,null);
 			}
 		}
 		
+	}
+	
+	
+	public void setUnlock(boolean unlock) {
+		this.unlock = unlock;
 	}
 
 	public ArrayList<Pair<Integer, Integer>> getLstPosQuestion(){

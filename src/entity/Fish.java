@@ -8,6 +8,7 @@ import java.awt.image.BufferedImage;
 import main.Game;
 import root.IOHandler;
 import root.MoveHandler;
+import root.Pair;
 
 public class Fish{
 	private float x, y;
@@ -31,7 +32,12 @@ public class Fish{
 	private float yOffset = 12 * Game.SCALE;
 	
 	//Key lock 
-	private boolean isUnlock; 
+	private boolean unlock; 
+	private boolean touchLock;
+	
+	//hints
+	private Pair<Integer, Integer> hintPos;
+	private boolean touchHint;
 	
 	public Fish(float x, float y, float width, float height, String color) {
 		super();
@@ -47,6 +53,7 @@ public class Fish{
 		fishImg = fishImg.getSubimage(12, 20, 40, 26);
 		
 		moveHandler = new MoveHandler();
+		hintPos = new Pair<Integer, Integer> (0, 0);
 	}
 	
 	private String getFishColor(String color) {
@@ -58,7 +65,7 @@ public class Fish{
 	public void render(Graphics g,int xMapOffset) {
 		g.drawImage(fishImg,(int)hitbox.x - xMapOffset, (int)hitbox.y, (int)hitbox.width, (int)hitbox.height, null);
 		g.setColor(Color.PINK);
-		g.drawRect((int)hitbox.x - xMapOffset, (int)hitbox.y, (int)hitbox.width, (int)hitbox.height);
+		//g.drawRect((int)hitbox.x - xMapOffset, (int)hitbox.y, (int)hitbox.width, (int)hitbox.height);
 	}
 	
 	public void updatePosition() {
@@ -71,24 +78,50 @@ public class Fish{
 		else if (down && !up) dentaY += denta;
 		
 
-		//checklock
-		if(moveHandler.isValidStep(hitbox.x + dentaX, hitbox.y + dentaY, hitbox.width, hitbox.height, mapData, isUnlock)) {
+		//collision
+		if(moveHandler.isValidStep(hitbox.x + dentaX, hitbox.y + dentaY, hitbox.width-10, hitbox.height, mapData, unlock)) {
 			hitbox.x += dentaX;
 			hitbox.y += dentaY;
 		}
+		//check touch lock
+		if(moveHandler.isTouchLock()) {
+			touchLock=true;
+		}
+		else {
+			touchLock=false;
+		}
+		
+		//check touch hints
+		if(moveHandler.isTouchHint()) {
+			touchHint=true;
+			int xHint = moveHandler.getHintPos().first;
+			int yHint = moveHandler.getHintPos().second;
+			hintPos = new Pair<Integer, Integer>(xHint, yHint);
+		}
+		else {
+			touchHint=false;
+		}
+		
 		
 	}
 	
-	public void updateLockStatus(boolean isUnclock) {
-		this.isUnlock = isUnlock;
+	public void updateLockStatus(boolean unlock) {
+		this.unlock = unlock;
+		//System.out.println("isUnlock:"+unlock);
 	}
 	
 	
-	
-
-	
 	//getters & setters
+	public Pair<Integer, Integer> getHintPos() {
+		return hintPos;
+	}
 	
+	public boolean isTouchLock() {
+		return touchLock;
+	}
+	public boolean isTouchHint() {
+		return touchHint;
+	}
 	
 	public int[][] getMapData() {
 		return mapData;

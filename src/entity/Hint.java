@@ -19,7 +19,7 @@ public class Hint {
 	
 	private Font font;
 	
-	private boolean isShowHint;
+	private boolean showHint;
 
 	
 	public Hint(int x, int y, int width, int height, String question) {
@@ -54,7 +54,7 @@ public class Hint {
     }
 	
 	public void render(Graphics g, int xMapOffset) {
-		if(isShowHint==true) {
+		if(showHint==true) {
 			g.drawImage(questionDialog, x - xMapOffset, y-Game.TILES_SIZE*3, width*4, height*3, null);
 			g.setFont(font);
 			drawQuestion(g, question,  x - xMapOffset+20, y-Game.TILES_SIZE*2+5);
@@ -62,5 +62,14 @@ public class Hint {
 	
 	}
 
+	public boolean isShowHint() {
+		return showHint;
+	}
+
+	public void setShowHint(boolean showHint) {
+		this.showHint = showHint;
+	}
+	
+	
 	
 }

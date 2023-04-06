@@ -1,6 +1,8 @@
 package main;
 
 import java.awt.Graphics;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.*;
 
 import entity.Fish;
@@ -18,6 +20,7 @@ public class Game implements Runnable {
 	private Fish fish1, fish2;
 	private Lock lock;
 	private ArrayList<Hint> lstHint;
+	private Map<Pair<Integer, Integer>, Integer> memHint;  
 
 	//config game
 	public final static int TILES_DEFAULT_SIZE = 32;
@@ -51,6 +54,9 @@ public class Game implements Runnable {
 		fish2 = new Fish(100*SCALE, 500*SCALE, 64*SCALE, 64*SCALE, "blue");
 		fish1.setMapData(map.getMapData());
 		fish2.setMapData(map.getMapData());
+
+		
+		
 		
 		String[] question = new String[] {
 			"The first character of key is S",
@@ -63,25 +69,34 @@ public class Game implements Runnable {
 		};
 		
 		lstHint = new ArrayList<Hint>();
-		int i =0;
-		for(var q: map.getLstPosQuestion()) {
-//			System.out.println(q.first+" "+q.second);
-			lstHint.add(new Hint(TILES_SIZE*q.first, TILES_SIZE*q.second,TILES_SIZE ,TILES_SIZE,question[i]));
-			i++;
-		}
-		lock = new Lock(TILES_SIZE*map.getPosLockX(), TILES_SIZE*map.getPosLockY(), TILES_SIZE*4, TILES_SIZE*2);
+		ArrayList<Pair<Integer, Integer>> posQuestion = map.getLstPosQuestion();
+		memHint = new HashMap<>();
 		
+		for (int i = 0; i < posQuestion.size(); i++) {
+			memHint.put(posQuestion.get(i), i);
+			lstHint.add(new Hint(TILES_SIZE*posQuestion.get(i).first, TILES_SIZE*posQuestion.get(i).second,TILES_SIZE ,TILES_SIZE,question[i]));
+		}
 
+		lock = new Lock(TILES_SIZE*map.getPosLockX(), TILES_SIZE*map.getPosLockY(), TILES_SIZE*4, TILES_SIZE*2, "shark");
+		
 		panel = new Panel(this, GAME_WIDTH, GAME_HEIGHT);// create panel
 		screen = new Screen(panel);// Create window
 		
 		
+		panel.add(lock.getPasswordPanel());
 		panel.setFocusable(true);
 		panel.requestFocusInWindow();
 		movingEvent = new MoveHandler(fish1, fish2, panel);
 		panel.addKeyListener(movingEvent);
 		panel.requestFocus();
-		
+		panel.addMouseListener(new MouseAdapter() {
+		    @Override
+		    public void mouseClicked(MouseEvent e) {
+		        if (panel.contains(e.getPoint())) {
+		            panel.requestFocusInWindow();
+		        }
+		    }
+		});
 		// thread
 		viewUpdateThread = new Thread(this);
 		viewUpdateThread.start();
@@ -97,13 +112,38 @@ public class Game implements Runnable {
 		for(var q: lstHint) {
 			q.render(g, xMapOffset);
 		}
-//		lock.render(g,xMapOffset);
+		lock.render(xMapOffset);
 		fish1.render(g, xMapOffset);
 		fish2.render(g, xMapOffset);
 		
 	}
 	
-	public void extendMap() {
+	private void updateLock() {
+		if(fish1.isTouchLock()||fish2.isTouchLock()) {
+			lock.setShowInput(true);
+		}
+		else {
+			lock.setShowInput(false);
+		}
+	}
+	
+	private void updateHint() {
+		for(var hint: lstHint) 
+			hint.setShowHint(false);
+		
+		if(fish1.isTouchHint()) {
+			int selectedHint = memHint.get(fish1.getHintPos());
+			lstHint.get(selectedHint).setShowHint(true);
+		}
+		
+		if(fish2.isTouchHint()) {
+			int selectedHint = memHint.get(fish2.getHintPos());
+			lstHint.get(selectedHint).setShowHint(true);
+		}	
+		
+	}
+	
+	private void extendMap() {
 		int mapTilesWide = map.getMapData()[0].length;
 		int maxTilesOffset = mapTilesWide - TILES_IN_WIDTH;
 		int maxMapOffsetX = maxTilesOffset * TILES_SIZE;
@@ -141,10 +181,13 @@ public class Game implements Runnable {
 			previousTime = currentTime;
 			
 			if(deltaF >= 1) {
+				map.setUnlock(lock.isUnlock());
 				fish1.updateLockStatus(lock.isUnlock());
 				fish2.updateLockStatus(lock.isUnlock());
 				fish1.updatePosition();
 				fish2.updatePosition();
+				updateHint();
+				updateLock();
 				extendMap();
 				panel.repaint();
 				frames++;

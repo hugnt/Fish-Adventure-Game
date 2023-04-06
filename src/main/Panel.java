@@ -24,8 +24,8 @@ public class Panel extends JPanel{
 		
 		Dimension size = new Dimension(width, height);
 		setPreferredSize(size);
+		setLayout(null);
 	}
-
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);//pre-work clean surface
 		g.drawImage(background, 0, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT, null);

@@ -13,11 +13,17 @@ public class MoveHandler implements KeyListener {
 	private Fish f1, f2;
 	private Panel panel;
 	
-	//spectial Object collition
-	private Pair<Integer, Integer> hintPos;  
+	//special Object collition
+	private boolean touchHint;
+	private Pair<Integer, Integer> hintPos;
+	
+	private boolean touchLock;
+	private Pair<Integer, Integer> lockPos;
+	
 	
 	public MoveHandler() {
 		hintPos = new Pair<Integer, Integer> (0, 0);
+		lockPos = new Pair<Integer, Integer> (0, 0);
 	}
 	
 	public MoveHandler(Fish f1, Fish f2,Panel panel) {
@@ -26,15 +32,15 @@ public class MoveHandler implements KeyListener {
 		this.panel = panel;
 	}
 	
-	public boolean isValidStep(float x, float y, float width, float height, int[][] lvlData, boolean isUnlock) {
+	public boolean isValidStep(float x, float y, float width, float height, int[][] lvlData, boolean unlock) {
 		//top-left
-		if(isValidPoint(x, y, lvlData, isUnlock)) {
+		if(isValidPoint(x, y, lvlData, unlock)) {
 			//bottom - right
-			if(isValidPoint(x + width, y + height, lvlData,isUnlock)) {
+			if(isValidPoint(x + width, y + height, lvlData,unlock)) {
 				//top - right
-				if(isValidPoint(x + width, y, lvlData, isUnlock)) {
+				if(isValidPoint(x + width, y, lvlData, unlock)) {
 					//bottom left
-					if(isValidPoint(x , y + height, lvlData, isUnlock)) {
+					if(isValidPoint(x , y + height, lvlData, unlock)) {
 						//System.out.println("FORTH: x: "+x +"y: "+y + height);
 						return true;
 					}	
@@ -48,7 +54,7 @@ public class MoveHandler implements KeyListener {
 	
 
 	//check position
-	private boolean isValidPoint(float x, float y, int[][] mapData, boolean isUnlock) {
+	private boolean isValidPoint(float x, float y, int[][] mapData, boolean unlock) {
 		int maxWidth = mapData[0].length * Game.TILES_SIZE;
 		if(x < 0 || x >= maxWidth) {
 			//System.out.println("x OUT OF Width" + Game.GAME_WIDTH );
@@ -63,19 +69,42 @@ public class MoveHandler implements KeyListener {
 		float yIndex = y / Game.TILES_SIZE;
 		
 		int value = mapData[(int)yIndex][(int)xIndex];
-		
+		//System.out.println((int)xIndex+" "+(int)yIndex);
 		//checkInHint
 		if(value == 19) {
+			touchHint = true;
 			hintPos = new Pair<Integer, Integer> ((int)xIndex, (int)yIndex);
-		};
+			//System.out.println((int)xIndex+" "+(int)yIndex);
+		}
+		if(Math.abs(hintPos.first-(int)xIndex)>2 || Math.abs(hintPos.second-(int)yIndex)>2) {
+			touchHint = false;
+		}
+		
+		
+		//check lock
+		if(unlock == false) {
+			if(value == 28||value==29||value==30||value==31||value==35||value==36||value==37||value==38) {
+				touchLock = true;
+				//key lock check opening
+				lockPos = new Pair<Integer, Integer> ((int)xIndex, (int)yIndex);
+				return false;
+			}
+			if(Math.abs(lockPos.first-(int)xIndex)>2 || Math.abs(lockPos.second-(int)yIndex)>2) {
+				touchLock = false;
+			}
+		}
+		else {
+			touchLock = false;
+			if(value == 28||value==29||value==30||value==31||value==35||value==36||value==37||value==38) {
+				return true;
+			}
+		}
+		
+		
 		if(value >= 48 || value < 0|| value != 6) {
 			//System.out.println("index OUT OF Value" + value);
 			return false;
 		}
-		
-		//key lock check opening
-		if(value==18 && isUnlock==false) return false;
-		
 		return true;
 
 	}
@@ -83,6 +112,15 @@ public class MoveHandler implements KeyListener {
 	//getter & setter
 	public Pair<Integer, Integer> getHintPos() {
 		return hintPos;
+	}
+	
+	
+	public boolean isTouchHint() {
+		return touchHint;
+	}
+	
+	public boolean isTouchLock() {
+		return touchLock;
 	}
 	
 	@Override
