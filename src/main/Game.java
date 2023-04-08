@@ -9,6 +9,9 @@ import entity.Fish;
 import entity.Lock;
 import entity.Hint;
 import map.Atlas;
+import menu.Menu;
+import menu.StartMenu;
+import root.IOHandler;
 import root.MoveHandler;
 import root.Pair;
 
@@ -16,47 +19,84 @@ public class Game implements Runnable {
 
 	private Screen screen;
 	private Panel panel;
+	private Menu startMenu;
 	private Atlas map;
 	private Fish fish1, fish2;
 	private Lock lock;
 	private ArrayList<Hint> lstHint;
 	private Map<Pair<Integer, Integer>, Integer> memHint;  
 
+	//game status
+	private boolean running;
+	
 	//config game
-	public final static int TILES_DEFAULT_SIZE = 32;
-	public final static float SCALE = 1.2f;
-	public final static int TILES_IN_WIDTH = 26;
+	public static int TILES_DEFAULT_SIZE;
+	public static float SCALE;
+	public static int TILES_IN_WIDTH;
 	public final static int TILES_IN_HEIGHT = 22;
-	public final static int TILES_SIZE = (int) (TILES_DEFAULT_SIZE * SCALE);
-	public final static int GAME_WIDTH = TILES_SIZE * TILES_IN_WIDTH;
-	public final static int GAME_HEIGHT = TILES_SIZE * TILES_IN_HEIGHT;
+	public static int TILES_SIZE;
+	public static int GAME_WIDTH;
+	public static int GAME_HEIGHT;
 
 	// Events
 	private MoveHandler movingEvent;
 
-	// update view thread
-	private Thread viewUpdateThread;
+	//display thread
+	private Thread displayThread;
 	private final int FPS_SET = 120;
 
 	//Extend map
 	private int xMapOffset = 0;
-	private int leftBorder = (int) (0.4 * GAME_WIDTH);
-	private int rightBorder = (int) (0.6 * GAME_WIDTH);
-	
+	private int leftBorder;
+	private int rightBorder;
 	
 	
 	public Game() {
+		importConfig();
+		
+		startMenu = new StartMenu();
+		panel = new Panel(this, GAME_WIDTH, GAME_HEIGHT);// create panel
+		screen = new Screen(panel);// Create window
+		startMenu.setRunning(false);
+		panel.setMenu(startMenu);
+		if(startMenu.isRunning()) {
+			panel.add(startMenu.getMenuPanel());
+		}
+		panel.setFocusable(true);
+		panel.requestFocusInWindow();
+		panel.requestFocus();
+		panel.addMouseListener(new MouseAdapter() {
+		    @Override
+		    public void mouseClicked(MouseEvent e) {
+		        if (panel.contains(e.getPoint())) {
+		            panel.requestFocusInWindow();
+		        }
+		    }
+		});
+		
+		start();
+		
 	};
+	
+	public void importConfig() {
+		TILES_DEFAULT_SIZE = Integer.parseInt(IOHandler.getProperty("TILES_DEFAULT_SIZE").trim());
+		SCALE = Float.parseFloat(IOHandler.getProperty("SCALE").trim());
+		TILES_IN_WIDTH = Integer.parseInt(IOHandler.getProperty("TILES_IN_WIDTH").trim());
+		TILES_SIZE = (int) (TILES_DEFAULT_SIZE * SCALE);
+		GAME_WIDTH = TILES_SIZE * TILES_IN_WIDTH;
+		GAME_HEIGHT = TILES_SIZE * TILES_IN_HEIGHT;
+		
+		leftBorder = (int) (0.4 * GAME_WIDTH);
+		rightBorder = (int) (0.6 * GAME_WIDTH);
+	}
 
 	public void start() {
 		map = new Atlas();
-		fish1 = new Fish(100*SCALE, 200*SCALE, 64*SCALE, 64*SCALE, "red");
-		fish2 = new Fish(100*SCALE, 500*SCALE, 64*SCALE, 64*SCALE, "blue");
+		fish1 = new Fish(TILES_SIZE*2, TILES_SIZE*6, 64*SCALE, 64*SCALE, "red");
+		fish2 = new Fish(TILES_SIZE*2, TILES_SIZE*16, 64*SCALE, 64*SCALE, "blue");
 		fish1.setMapData(map.getMapData());
 		fish2.setMapData(map.getMapData());
 
-		
-		
 		
 		String[] question = new String[] {
 			"The first character of key is S",
@@ -78,28 +118,14 @@ public class Game implements Runnable {
 		}
 
 		lock = new Lock(TILES_SIZE*map.getPosLockX(), TILES_SIZE*map.getPosLockY(), TILES_SIZE*4, TILES_SIZE*2, "shark");
-		
-		panel = new Panel(this, GAME_WIDTH, GAME_HEIGHT);// create panel
-		screen = new Screen(panel);// Create window
-		
-		
 		panel.add(lock.getPasswordPanel());
-		panel.setFocusable(true);
-		panel.requestFocusInWindow();
+		
 		movingEvent = new MoveHandler(fish1, fish2, panel);
 		panel.addKeyListener(movingEvent);
-		panel.requestFocus();
-		panel.addMouseListener(new MouseAdapter() {
-		    @Override
-		    public void mouseClicked(MouseEvent e) {
-		        if (panel.contains(e.getPoint())) {
-		            panel.requestFocusInWindow();
-		        }
-		    }
-		});
+		running = true;
 		// thread
-		viewUpdateThread = new Thread(this);
-		viewUpdateThread.start();
+		displayThread = new Thread(this);
+		displayThread.start();
 		
 	}
 
@@ -201,5 +227,14 @@ public class Game implements Runnable {
 			}
 		}
 	}
+
+	public boolean isRunning() {
+		return running;
+	}
+
+	public void setRunning(boolean running) {
+		this.running = running;
+	}
+	
 		
 }

@@ -11,6 +11,9 @@ import java.awt.Font;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
+
+import main.Game;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -48,12 +51,15 @@ public class Lock {
 		
 		//label
 		label = new JLabel("Enter password: ");
-		Font font = new Font("Arial", Font.PLAIN, 12);
+		Font font = new Font("Arial", Font.PLAIN, (int)(11*Game.SCALE));
+		label.setPreferredSize(new Dimension(width, (int)((height-10)/3)));
 		label.setFont(font);
 		
 		//text-input
-		input = new JTextField(10);
+		input = new JTextField(password.length()+5);
+		input.setBorder(null);
 		input.setBackground(new Color(245, 243, 142, 255));
+		input.setPreferredSize(new Dimension(width, (int)((height-10)/3)));
 		input.addActionListener(new ActionListener() {
 		    public void actionPerformed(ActionEvent e) {
 		        String res = input.getText().toLowerCase();
@@ -72,8 +78,10 @@ public class Lock {
 		
 		//btn
 		cfBtn = new JButton("Confirm");
-		cfBtn.setPreferredSize(new Dimension(40, 20));
+		cfBtn.setPreferredSize(new Dimension(width, (int)((height-10)/3)));
+		cfBtn.setFocusPainted(false);
 		cfBtn.setBackground(new Color(226, 180, 54, 255));
+		cfBtn.setFont(font);
 		cfBtn.addActionListener(new ActionListener() {
 		    public void actionPerformed(ActionEvent e) {
 		        String res = input.getText().toLowerCase();
@@ -90,7 +98,7 @@ public class Lock {
 		    }
 		});
 		
-		Border padding = BorderFactory.createEmptyBorder(10, 5, 10, 5);
+		Border padding = BorderFactory.createEmptyBorder(5, 5, 5, 5);
 		passwordPanel.setBorder(padding);
 		
 		passwordPanel.add(label, BorderLayout.NORTH);

@@ -89,7 +89,7 @@ public class Atlas {
 
 	
 	public void render(Graphics g, int xMapOffset) {
-		for (int i = 0; i < Game.TILES_IN_HEIGHT; i++) {
+		for (int i = 0; i < mapData.length; i++) {
 			for (int j = 0; j < mapData[0].length; j++) {
 				int index = getSpriteIndex(j, i);
 				if(unlock==true) {
