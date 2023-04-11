@@ -8,5 +8,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="images"/>
 	<classpathentry kind="src" path="fonts"/>
+	<classpathentry kind="src" path="audios"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

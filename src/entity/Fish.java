@@ -15,11 +15,15 @@ public class Fish{
 	private float width, height;
 	private BufferedImage fishImg;
 	
+	//Other Fish
+	private Fish otherFish;
+	
 	//move;
 	private boolean up = false;
 	private boolean right = false;
 	private boolean down = false;
 	private boolean left = false;
+	private boolean moving;
 	
 	//constant
 	private final float denta = 2.0f;
@@ -45,6 +49,7 @@ public class Fish{
 		this.y = y;
 		this.width = width;
 		this.height = height;
+		moving = true;
 		
 		hitbox = new Rectangle2D.Float(x - xOffset, y - yOffset, 40* Game.SCALE, 26* Game.SCALE);
 		
@@ -69,6 +74,7 @@ public class Fish{
 	}
 	
 	public void updatePosition() {
+		//moving = true;
 		float dentaX = 0, dentaY = 0;
 		
 		if (left && !right) dentaX -= denta;
@@ -80,9 +86,18 @@ public class Fish{
 
 		//collision
 		if(moveHandler.isValidStep(hitbox.x + dentaX, hitbox.y + dentaY, hitbox.width-10, hitbox.height, mapData, unlock)) {
-			hitbox.x += dentaX;
-			hitbox.y += dentaY;
+			if(dentaX!=0||dentaY!=0) {
+				if(otherFish.isMoving() == true){
+					hitbox.x += dentaX;
+					hitbox.y += dentaY;
+				}
+				moving = true;
+			}
 		}
+		else {
+			moving = false;
+		}
+	
 		//check touch lock
 		if(moveHandler.isTouchLock()) {
 			touchLock=true;
@@ -104,7 +119,19 @@ public class Fish{
 		
 		
 	}
+
 	
+	public void setOtherFish(Fish otherFish) {
+		this.otherFish = otherFish;
+	}
+
+	public boolean isMoving() {
+		return moving;
+	}
+
+
+
+
 	public void updateLockStatus(boolean unlock) {
 		this.unlock = unlock;
 		//System.out.println("isUnlock:"+unlock);

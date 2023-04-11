@@ -66,6 +66,7 @@ public class Lock {
 		        if(password.equals(res)) {
 		        	unlock = true;
 		        	isShowInput = false;
+		        	input.setText("");
 		        	//System.out.println(unlock+" "+isShowInput);
 		        	System.out.println("Correct answer!!");
 		        }
@@ -118,6 +119,11 @@ public class Lock {
 		}
 		
 		
+	}
+	public void reset() {
+		input.setText("");
+		unlock = false;
+		isShowInput = true;
 	}
 	
 

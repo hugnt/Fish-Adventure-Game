@@ -14,7 +14,7 @@ public class Atlas {
 	private int[][] mapData;
 	private BufferedImage[] mapSprites;
 	private final String SPRITES_URL = "map_sprites05.png"; 
-	private final String MAP_URL = "map005.png"; 
+	private String MAP_URL; 
 	
 	
 	//other objects
@@ -24,7 +24,8 @@ public class Atlas {
 	private boolean unlock;
 	
 	
-	public Atlas() {
+	public Atlas(String level) {
+		MAP_URL = level;
 		importMapSprites();
 		create();
 	}
@@ -36,17 +37,11 @@ public class Atlas {
 		for (int i = 0; i < 7; i++) {
 			for (int j = 0; j < 7; j++) {
 				int index = i*7 + j;
-				System.out.println(index);
+				//System.out.println(index);
 				mapSprites[index] = img.getSubimage(j*512, i*512, 512 , 512);
 				
 			}
 		}
-	}
-	
-	private int[][] generate() {
-		int[][] mapMaker = new int[10][10];
-		
-		return mapMaker;
 	}
 	
 	//can pass create() wwith a matrix to generate map
@@ -62,7 +57,7 @@ public class Atlas {
 			for (int j = 0; j < img.getWidth(); j++) {
 				Color color = new Color(img.getRGB(j, i));//get per pixel tile's color of img
 				int value = color.getRed();
-				System.out.println("value: "+value);
+				//System.out.println("value: "+value);
 				if(value >= 49)
 				{
 					value = 6;

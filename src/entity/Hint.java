@@ -49,7 +49,6 @@ public class Hint {
 	    }
 	    // add the last line to the graphics context
 	    g.drawString(line.toString(), x, y += g.getFontMetrics().getHeight());
-	    
 	}
 	
 	public void render(Graphics g, int xMapOffset) {

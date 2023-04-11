@@ -35,7 +35,11 @@ public class StartMenu extends Menu {
 	private BufferedImage intro;
 	private final int fishSize = Game.TILES_SIZE*6;
 	
-	public StartMenu(){
+	private LevelMenu lvlMenu;
+	
+	
+	
+	public StartMenu(Game game){
 		running = true;
 		
 		fish1 = IOHandler.getImage("blue_fish.png");
@@ -48,7 +52,7 @@ public class StartMenu extends Menu {
 		fontBtn = IOHandler.getFont("RussoOne-Regular.ttf").deriveFont(Font.PLAIN, (float)(BUTTON_SIZE.height/3));;
 		fontTitle = IOHandler.getFont("BungeeShade-Regular.ttf").deriveFont(Font.PLAIN, (float)(Game.GAME_HEIGHT/10));
 		
-		
+		lvlMenu = new LevelMenu(game);
 		JButton btnStart = new JButton("START");
         btnStart.setPreferredSize(BUTTON_SIZE);
         btnStart.setBackground(COLOR_BUTTON);
@@ -56,6 +60,16 @@ public class StartMenu extends Menu {
         btnStart.setFocusPainted(false);
         btnStart.setFont(fontBtn);
         btnStart.setOpaque(false);
+        btnStart.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	running = false;
+            	menuPanel.setVisible(false);
+            	game.getPanel().repaint();
+            	game.getPanel().setMenu(lvlMenu);
+            	game.getPanel().add(lvlMenu.getMenuPanel());
+            	
+            }
+        });
        
         
         JButton btnInstruction = new JButton("INSTRUCTION");
@@ -84,7 +98,11 @@ public class StartMenu extends Menu {
         btnExit.setFocusPainted(false);
         btnExit.setFont(fontBtn);
         btnExit.setOpaque(false);
-        //btnExit.setContentAreaFilled(false);
+        btnExit.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
         
        
 		menuPanel.add(btnStart);
@@ -131,5 +149,13 @@ public class StartMenu extends Menu {
 		this.menuPanel = menuPanel;
 		
 	}
+
+	public LevelMenu getLvlMenu() {
+		return lvlMenu;
+	}
+
+
+	
+	
 	
 }

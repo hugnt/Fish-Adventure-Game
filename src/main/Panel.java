@@ -22,7 +22,6 @@ public class Panel extends JPanel{
 		this.game = game;
 		this.height = height;
 		this.width = width;
-		
 		background = IOHandler.getImage(BG_URL);
 		
 		Dimension size = new Dimension(width, height);
@@ -35,7 +34,7 @@ public class Panel extends JPanel{
 		if(game.isRunning()) {
 			game.render(g);
 		}
-		else if(menu.isRunning()){
+		else if(menu!=null&&menu.isRunning()){
 			menu.render(g);
 		}
 		else {
