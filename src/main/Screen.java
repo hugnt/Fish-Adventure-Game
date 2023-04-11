@@ -19,4 +19,5 @@ public class Screen {
 		screen.setLocationRelativeTo(null);//put the window on the center of screen
 		screen.setVisible(true);//display the window
 	}
+	
 }

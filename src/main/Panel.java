@@ -48,4 +48,6 @@ public class Panel extends JPanel{
 		this.menu = menu;
 	}
 	
+
+	
 }

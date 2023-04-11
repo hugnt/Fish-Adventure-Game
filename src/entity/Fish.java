@@ -43,6 +43,9 @@ public class Fish{
 	private Pair<Integer, Integer> hintPos;
 	private boolean touchHint;
 	
+	//trap
+	private boolean touchTrap;
+	
 	public Fish(float x, float y, float width, float height, String color) {
 		super();
 		this.x = x;
@@ -69,7 +72,7 @@ public class Fish{
 	
 	public void render(Graphics g,int xMapOffset) {
 		g.drawImage(fishImg,(int)hitbox.x - xMapOffset, (int)hitbox.y, (int)hitbox.width, (int)hitbox.height, null);
-		g.setColor(Color.PINK);
+		//g.setColor(Color.PINK);
 		//g.drawRect((int)hitbox.x - xMapOffset, (int)hitbox.y, (int)hitbox.width, (int)hitbox.height);
 	}
 	
@@ -97,6 +100,14 @@ public class Fish{
 		else {
 			moving = false;
 		}
+		//check touch trap
+		if(moveHandler.isTouchTrap()) {
+			touchTrap=true;
+		}
+		else {
+			touchTrap=false;
+		}
+		
 	
 		//check touch lock
 		if(moveHandler.isTouchLock()) {
@@ -150,6 +161,11 @@ public class Fish{
 		return touchHint;
 	}
 	
+	
+	public boolean isTouchTrap() {
+		return touchTrap;
+	}
+
 	public int[][] getMapData() {
 		return mapData;
 	}

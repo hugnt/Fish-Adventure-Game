@@ -17,6 +17,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
+import entity.Enemy;
 import entity.Fish;
 import entity.Lock;
 import entity.Hint;
@@ -41,9 +42,13 @@ public class Game implements Runnable {
 	private Lock lock;
 	private ArrayList<Hint> lstHint;
 	private Map<Pair<Integer, Integer>, Integer> memHint;
+	
+	private ArrayList<Enemy> crab, octo;
 
 	// game status
 	private boolean running;
+	private boolean win;
+	private boolean lose;
 
 	// config game
 	public static int TILES_DEFAULT_SIZE;
@@ -110,7 +115,7 @@ public class Game implements Runnable {
 	}
 
 	public void start(String level) {
-		
+		win = lose = false;
 		map = new Atlas(level);
 		fish1 = new Fish(TILES_SIZE * 2, TILES_SIZE * 6, 64 * SCALE, 64 * SCALE, "red");
 		fish2 = new Fish(TILES_SIZE * 2, TILES_SIZE * 16, 64 * SCALE, 64 * SCALE, "blue");
@@ -163,7 +168,22 @@ public class Game implements Runnable {
 			}
 		});
         panel.add(btnPause);
-
+        
+        Enemy.mapData = map.getMapData();
+        crab = new ArrayList<Enemy>();
+        octo = new ArrayList<Enemy>();
+        var lstPosCrab = map.getLstPosCrab();
+        var lstPosOcto = map.getLstPosOcto();
+        
+        for(var c : lstPosCrab) {
+        	crab.add(new Enemy(TILES_SIZE *c.first, TILES_SIZE *c.second, 410, 410, "crab.png"));
+  
+        }
+       
+        for(var o : lstPosOcto) {
+       	 	crab.add(new Enemy(TILES_SIZE *o.first, TILES_SIZE *o.second, 728, 728, "octopus.png"));
+       }
+        
 		running = true;
 		// thread
 		displayThread = new Thread(this);
@@ -180,15 +200,23 @@ public class Game implements Runnable {
 	}
 
 	public void render(Graphics g) {
-		map.render(g, xMapOffset);
+		for (var c : crab) {
+			c.render(g, xMapOffset);
+		}
+		for (var o : octo) {
+			o.render(g, xMapOffset);
+		}
 		for (var q : lstHint) {
 			q.render(g, xMapOffset);
 		}
+		map.render(g, xMapOffset);
 		lock.render(xMapOffset);
 		fish1.render(g, xMapOffset);
 		fish2.render(g, xMapOffset);
 
 	}
+	
+	
 
 	private void updateLock() {
 		if (fish1.isTouchLock() || fish2.isTouchLock()) {
@@ -197,7 +225,6 @@ public class Game implements Runnable {
 			lock.setShowInput(false);
 		}
 		
-
 	}
 
 	private void updateHint() {
@@ -214,6 +241,15 @@ public class Game implements Runnable {
 			lstHint.get(selectedHint).setShowHint(true);
 		}
 
+	}
+	
+	private void updateRes() {
+		if(lock.isUnlock()) {
+			win = true;
+		}
+		else if(fish1.isTouchTrap()||fish1.isTouchTrap()) {
+			lose = true;
+		}
 	}
 
 	private void extendMap() {
@@ -245,7 +281,7 @@ public class Game implements Runnable {
 
 		double deltaF = 0;
 		while (true&&!displayThread.isInterrupted()) {
-			if(lock.isUnlock()) {
+			if(win == true||lose == true) {
 				lock.reset();
 				ResultMenu resMenu = new ResultMenu(this);
 				resMenu.setRunning(true);	
@@ -262,6 +298,13 @@ public class Game implements Runnable {
 				fish2.updateLockStatus(lock.isUnlock());
 				fish1.updatePosition();
 				fish2.updatePosition();
+				for (var c : crab) {
+					c.updatePosition();
+				}
+				for (var o : octo) {
+					o.updatePosition();
+				}
+				updateRes();
 				updateHint();
 				updateLock();
 				extendMap();
@@ -299,6 +342,27 @@ public class Game implements Runnable {
 	public Menu getStartMenu() {
 		return startMenu;
 	}
+
+
+	public boolean isWin() {
+		return win;
+	}
+
+
+	public void setWin(boolean win) {
+		this.win = win;
+	}
+
+
+	public boolean isLose() {
+		return lose;
+	}
+
+
+	public void setLose(boolean lose) {
+		this.lose = lose;
+	}
+	
 
 
 }

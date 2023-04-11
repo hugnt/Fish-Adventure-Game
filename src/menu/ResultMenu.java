@@ -20,15 +20,15 @@ public class ResultMenu extends Menu{
 	private final Dimension PANEL_SIZE = new Dimension(BUTTON_SIZE.width*2, BUTTON_SIZE.height*4+GAP_BETWEEN_BUTTON.height*4);
 	private Font fontBtn;
 	private Font fontTitle;
-	private String title = "YOU WIN";
-	private JDialog pauseDialog;
+	private String title = "RESULT";
+	private JDialog resDialog;
 	
 	public ResultMenu(Game game) {
-		pauseDialog = new JDialog();
-		pauseDialog.setModal(true);
+		resDialog = new JDialog();
+		resDialog.setModal(true);
 		
-		pauseDialog.setLayout(new FlowLayout(FlowLayout.CENTER, GAP_BETWEEN_BUTTON.width, GAP_BETWEEN_BUTTON.height-10));
-		pauseDialog.setFocusable(true);
+		resDialog.setLayout(new FlowLayout(FlowLayout.CENTER, GAP_BETWEEN_BUTTON.width, GAP_BETWEEN_BUTTON.height-10));
+		resDialog.setFocusable(true);
 		fontBtn = IOHandler.getFont("RussoOne-Regular.ttf").deriveFont(Font.PLAIN, (float)(BUTTON_SIZE.height/3));;
 		
 		fontTitle = IOHandler.getFont("RussoOne-Regular.ttf").deriveFont(Font.PLAIN, (float)(BUTTON_SIZE.height/1.5));
@@ -67,7 +67,7 @@ public class ResultMenu extends Menu{
 			public void actionPerformed(ActionEvent e) {
 				game.end();
 				game.start("map005.png");
-				pauseDialog.setVisible(false);
+				resDialog.setVisible(false);
 				game.getPanel().requestFocus();
 				
 			}
@@ -85,7 +85,7 @@ public class ResultMenu extends Menu{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				game.end();
-				pauseDialog.setVisible(false);
+				resDialog.setVisible(false);
 				var lvlMenu = ((StartMenu)game.getStartMenu()).getLvlMenu();
 				game.getPanel().add(lvlMenu.getMenuPanel());
 				lvlMenu.setRunning(true);
@@ -94,24 +94,24 @@ public class ResultMenu extends Menu{
             	
 			}
 		});
-        
-        pauseDialog.add(lbResult);
-        pauseDialog.add(btnNextLevel);
-        pauseDialog.add(btnRestart);
-        pauseDialog.add(btnExitToMap);
+        if(game.isWin()==true) lbResult.setText("YOU WIN");
+        else if(game.isLose()==true) lbResult.setText("GAME OVER");
+        resDialog.add(lbResult);
+        if(game.isWin()==true) resDialog.add(btnNextLevel);
+        resDialog.add(btnRestart);
+        resDialog.add(btnExitToMap);
 	
-        pauseDialog.setTitle("Pause Screen");
-        pauseDialog.setSize(PANEL_SIZE);
-        pauseDialog.setLocationRelativeTo(null);
-        pauseDialog.setUndecorated(true);
-        //pauseDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-        pauseDialog.setVisible(false);
+        resDialog.setSize(PANEL_SIZE);
+        resDialog.setLocationRelativeTo(null);
+        resDialog.setUndecorated(true);
+        //resDialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        resDialog.setVisible(false);
 		//menuPanel.setOpaque(false);
 	}
 	
 
 	public JDialog getPauseDialog() {
-		return pauseDialog;
+		return resDialog;
 	}
 
 	@Override
@@ -127,7 +127,7 @@ public class ResultMenu extends Menu{
 	@Override
 	public void setRunning(boolean running) {
 		this.running = running;
-		pauseDialog.setVisible(running);
+		resDialog.setVisible(running);
 	}
 
 	@Override

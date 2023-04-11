@@ -20,6 +20,9 @@ public class MoveHandler implements KeyListener {
 	private boolean touchLock;
 	private Pair<Integer, Integer> lockPos;
 	
+	//touching trap
+	private boolean touchTrap;
+	
 	
 	public MoveHandler() {
 		hintPos = new Pair<Integer, Integer> (0, 0);
@@ -69,7 +72,19 @@ public class MoveHandler implements KeyListener {
 		float yIndex = y / Game.TILES_SIZE;
 		
 		int value = mapData[(int)yIndex][(int)xIndex];
-		//System.out.println((int)xIndex+" "+(int)yIndex);
+		
+		
+		//check in plant
+		if(value == 48||value ==47||value == 46) return true;
+		
+		//check in trap
+		if(value == 25||value ==26||value == 27) {
+			touchTrap = true;
+			return false;
+		}
+		
+		
+		
 		//checkInHint
 		if(value == 19) {
 			touchHint = true;
@@ -100,9 +115,9 @@ public class MoveHandler implements KeyListener {
 			}
 		}
 		
-		
+//		System.out.println("value:"+value);
 		if(value >= 48 || value < 0|| value != 6) {
-			//System.out.println("index OUT OF Value" + value);
+//			System.out.println("index OUT OF Value" + value);d
 			return false;
 		}
 		return true;
@@ -123,6 +138,12 @@ public class MoveHandler implements KeyListener {
 		return touchLock;
 	}
 	
+	
+	public boolean isTouchTrap() {
+		return touchTrap;
+	}
+
+
 	@Override
 	public void keyTyped(KeyEvent e) {
 		// TODO Auto-generated method stub

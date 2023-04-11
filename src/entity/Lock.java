@@ -123,7 +123,6 @@ public class Lock {
 	public void reset() {
 		input.setText("");
 		unlock = false;
-		isShowInput = true;
 	}
 	
 
