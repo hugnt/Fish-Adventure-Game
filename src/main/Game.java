@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.sql.SQLException;
 import java.util.*;
 
 import javax.sound.sampled.Clip;
@@ -25,30 +26,36 @@ import map.Atlas;
 import menu.AudioPlayer;
 import menu.LevelMenu;
 import menu.Menu;
+import menu.OptionPlaying;
 import menu.PauseMenu;
 import menu.ResultMenu;
 import menu.StartMenu;
+import models.HintEntity;
+import models.LevelEntity;
+import root.AppDbContext;
 import root.IOHandler;
 import root.MoveHandler;
 import root.Pair;
 
 public class Game implements Runnable {
 
-	private Screen screen;
+//	private Screen screen;
 	private Panel panel;
-	private Menu startMenu;
+	private Menu lvlMenu;
 	private Atlas map;
 	private Fish fish1, fish2;
 	private Lock lock;
 	private ArrayList<Hint> lstHint;
 	private Map<Pair<Integer, Integer>, Integer> memHint;
 	
-	private ArrayList<Enemy> crab, octo;
+	private ArrayList<Enemy> enemy;
 
 	// game status
 	private boolean running;
 	private boolean win;
 	private boolean lose;
+	private boolean touchEnemy;
+	
 
 	// config game
 	public static int TILES_DEFAULT_SIZE;
@@ -70,19 +77,28 @@ public class Game implements Runnable {
 	private int xMapOffset = 0;
 	private int leftBorder;
 	private int rightBorder;
+
+	private int currentLevel;
 	
-	//audio
-	private AudioPlayer audioPlayer;
+	
+	//map&& locks and hints
+	private ArrayList<LevelEntity> lvlEntity;
+	private ArrayList<HintEntity> hintEntity;
 
 	public Game() {
 		importConfig();
-		startMenu = new StartMenu(this);
+		lvlMenu = new LevelMenu(this);
+   
 		panel = new Panel(this, GAME_WIDTH, GAME_HEIGHT);// create panel
-		screen = new Screen(panel);// Create window
+		Main.STARTPANEL.setVisible(false);
+		Main.SCREEN.getScreen().add(panel);
 		
-		//panel.setMenu(startMenu);
-		//panel.add(startMenu.getMenuPanel());
-
+		panel.add(lvlMenu.getMenuPanel());
+    	panel.setMenu(lvlMenu);
+    	
+    	panel.repaint();
+    	panel.revalidate();
+		
 		panel.setFocusable(true);
 		panel.requestFocusInWindow();
 		panel.requestFocus();
@@ -95,8 +111,7 @@ public class Game implements Runnable {
 		    }
 		});
 		
-		audioPlayer = new AudioPlayer("audio1.wav");
-		start("map005.png");
+		
 
 	};
 	
@@ -112,11 +127,32 @@ public class Game implements Runnable {
 
 		leftBorder = (int) (0.4 * GAME_WIDTH);
 		rightBorder = (int) (0.6 * GAME_WIDTH);
+		
+		lvlEntity = new ArrayList<LevelEntity>();
+		hintEntity = new ArrayList<HintEntity>();
+		
+		//Import data from MySQL
+		try {
+			AppDbContext _dbContext = new AppDbContext();
+			lvlEntity = _dbContext.getLvlEntity();
+			hintEntity = _dbContext.getHintEntity();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+//		for (var hint : hintEntity) {
+//			System.out.println(hint.getLevelId()+": "+hint.getContent());
+//		}
+		
+		
 	}
 
-	public void start(String level) {
+	public void start(int level) {
+		currentLevel = level;
 		win = lose = false;
-		map = new Atlas(level);
+		map = new Atlas(getLevel(level));
 		fish1 = new Fish(TILES_SIZE * 2, TILES_SIZE * 6, 64 * SCALE, 64 * SCALE, "red");
 		fish2 = new Fish(TILES_SIZE * 2, TILES_SIZE * 16, 64 * SCALE, 64 * SCALE, "blue");
 		fish1.setOtherFish(fish2);
@@ -124,22 +160,31 @@ public class Game implements Runnable {
 		fish1.setMapData(map.getMapData());
 		fish2.setMapData(map.getMapData());
 
-		String[] question = new String[] { "The first character of key is S", "The key contains character K",
-				"The key relevants to a big fish", "The key contains character H", "More than 30000 teaths",
-				"Living in the ocean", "... Tank" };
-
-		lstHint = new ArrayList<Hint>();
-		ArrayList<Pair<Integer, Integer>> posQuestion = map.getLstPosQuestion();
-		memHint = new HashMap<>();
-
-		for (int i = 0; i < posQuestion.size(); i++) {
-			memHint.put(posQuestion.get(i), i);
-			lstHint.add(new Hint(TILES_SIZE * posQuestion.get(i).first, TILES_SIZE * posQuestion.get(i).second,
-					TILES_SIZE, TILES_SIZE, question[i]));
+		
+		var lstHintContent = new ArrayList<String>();
+		for (var hint : hintEntity) {
+			if(hint.getLevelId()==level) {
+				lstHintContent.add(hint.getContent());
+			}
 		}
-
+		
+		lstHint = new ArrayList<Hint>();
+		memHint = new HashMap<>();
+		ArrayList<Pair<Integer, Integer>> lstPosHint = map.getLstPosQuestion();
+		int i = 0;
+		for (var posHint : lstPosHint) {
+			memHint.put(posHint, i);
+			lstHint.add(new Hint(TILES_SIZE * posHint.first, TILES_SIZE * posHint.second,
+					TILES_SIZE, TILES_SIZE, lstHintContent.get(i)));
+			i++;
+		}
+		
+		String key1 = lvlEntity.get(level-1).getKeyAnswer();
+		String key2 = lvlEntity.get(level-1).getKeyAnswer2();
+		int limitTyping =  lvlEntity.get(level-1).getLimitTyping();
 		lock = new Lock(TILES_SIZE * map.getPosLockX(), TILES_SIZE * map.getPosLockY(), TILES_SIZE * 4, TILES_SIZE * 2,
-				"shark");
+				key1, key2, limitTyping);
+		
 		panel.add(lock.getPasswordPanel());
 
 		movingEvent = new MoveHandler(fish1, fish2, panel);
@@ -169,20 +214,23 @@ public class Game implements Runnable {
 		});
         panel.add(btnPause);
         
+        
+        //enemy
         Enemy.mapData = map.getMapData();
-        crab = new ArrayList<Enemy>();
-        octo = new ArrayList<Enemy>();
+        enemy = new ArrayList<Enemy>();
         var lstPosCrab = map.getLstPosCrab();
         var lstPosOcto = map.getLstPosOcto();
-        
-        for(var c : lstPosCrab) {
-        	crab.add(new Enemy(TILES_SIZE *c.first, TILES_SIZE *c.second, 410, 410, "crab.png"));
-  
-        }
+        var lstPosGrid = map.getLstPosGrid();
+        for(var c : lstPosCrab) 
+        	enemy.add(new Enemy(TILES_SIZE *c.first, TILES_SIZE *c.second, 410, 410, "crab.png", true));
        
-        for(var o : lstPosOcto) {
-       	 	crab.add(new Enemy(TILES_SIZE *o.first, TILES_SIZE *o.second, 728, 728, "octopus.png"));
-       }
+       for(var o : lstPosOcto) 
+        	enemy.add(new Enemy(TILES_SIZE *o.first, TILES_SIZE *o.second, 728, 728, "octopus.png", true));
+       
+       for(var g : lstPosGrid)
+    	   	enemy.add(new Enemy(TILES_SIZE *g.first, TILES_SIZE *g.second, 560, 560, "grid.png", false));
+       
+       	touchEnemy = false;
         
 		running = true;
 		// thread
@@ -200,11 +248,9 @@ public class Game implements Runnable {
 	}
 
 	public void render(Graphics g) {
-		for (var c : crab) {
-			c.render(g, xMapOffset);
-		}
-		for (var o : octo) {
-			o.render(g, xMapOffset);
+		
+		for (var amee : enemy) {
+			amee.render(g, xMapOffset);
 		}
 		for (var q : lstHint) {
 			q.render(g, xMapOffset);
@@ -244,12 +290,26 @@ public class Game implements Runnable {
 	}
 	
 	private void updateRes() {
+		
 		if(lock.isUnlock()) {
 			win = true;
 		}
-		else if(fish1.isTouchTrap()||fish1.isTouchTrap()) {
+		else if(fish1.isTouchTrap()||fish2.isTouchTrap()||touchEnemy||lock.isLose()) {
 			lose = true;
 		}
+	}
+	
+	private void updatePosEnemy() {
+		ArrayList<Pair<Float, Float>> fishPos = new ArrayList<Pair<Float, Float>>();
+		fishPos.add(fish1.getFishPos());
+		fishPos.add(fish2.getFishPos());
+		for (var amee : enemy) {
+			amee.updatePosition();
+			amee.setFishPos(fishPos);
+			
+			if(amee.isTouchFish()) touchEnemy = true;
+		}
+			
 	}
 
 	private void extendMap() {
@@ -298,12 +358,7 @@ public class Game implements Runnable {
 				fish2.updateLockStatus(lock.isUnlock());
 				fish1.updatePosition();
 				fish2.updatePosition();
-				for (var c : crab) {
-					c.updatePosition();
-				}
-				for (var o : octo) {
-					o.updatePosition();
-				}
+				updatePosEnemy();
 				updateRes();
 				updateHint();
 				updateLock();
@@ -315,7 +370,7 @@ public class Game implements Runnable {
 
 			if (System.currentTimeMillis() - lastCheck >= 1000) {
 				lastCheck = System.currentTimeMillis();
-				System.out.println("FPS: " + frames);
+//				System.out.println("FPS: " + frames);
 				frames = 0;
 			}
 		}
@@ -334,13 +389,9 @@ public class Game implements Runnable {
 	}
 
 
-	public AudioPlayer getAudioPlayer() {
-		return audioPlayer;
-	}
 
-
-	public Menu getStartMenu() {
-		return startMenu;
+	public Menu getLvlMenu() {
+		return lvlMenu;
 	}
 
 
@@ -349,19 +400,30 @@ public class Game implements Runnable {
 	}
 
 
-	public void setWin(boolean win) {
-		this.win = win;
-	}
-
-
 	public boolean isLose() {
 		return lose;
 	}
 
 
-	public void setLose(boolean lose) {
-		this.lose = lose;
+	public String getLevel(int level) {
+		return lvlEntity.get(level-1).getMap();
 	}
+	
+	public int getTotalLevel() {
+		return lvlEntity.size();
+	}
+
+
+	public int getCurrentLevel() {
+		return currentLevel;
+	}
+
+
+	public void setCurrentLevel(int currentLevel) {
+		this.currentLevel = currentLevel;
+	}
+
+	
 	
 
 

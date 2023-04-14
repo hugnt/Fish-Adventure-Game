@@ -21,6 +21,8 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 
 import main.Game;
+import main.Main;
+import main.Panel;
 import root.IOHandler;
 
 public class StartMenu extends Menu {
@@ -33,13 +35,14 @@ public class StartMenu extends Menu {
 	private BufferedImage fish1;
 	private BufferedImage fish2;
 	private BufferedImage intro;
-	private final int fishSize = Game.TILES_SIZE*6;
+	private final int fishSize = Main.TILES_SIZE*6;
 	
-	private LevelMenu lvlMenu;
+	//private LevelMenu lvlMenu;
+	private OptionPlaying optionMenu;
+	private SettingMenu settingMenu;
+	private Instruction instruction;
 	
-	
-	
-	public StartMenu(Game game){
+	public StartMenu(){
 		running = true;
 		
 		fish1 = IOHandler.getImage("blue_fish.png");
@@ -50,24 +53,31 @@ public class StartMenu extends Menu {
 		menuPanel.setLayout(new FlowLayout(FlowLayout.CENTER, GAP_BETWEEN_BUTTON.width, GAP_BETWEEN_BUTTON.height));
 		menuPanel.setFocusable(true);
 		fontBtn = IOHandler.getFont("RussoOne-Regular.ttf").deriveFont(Font.PLAIN, (float)(BUTTON_SIZE.height/3));;
-		fontTitle = IOHandler.getFont("BungeeShade-Regular.ttf").deriveFont(Font.PLAIN, (float)(Game.GAME_HEIGHT/10));
+		fontTitle = IOHandler.getFont("BungeeShade-Regular.ttf").deriveFont(Font.PLAIN, (float)(Main.GAME_HEIGHT/10));
 		
-		lvlMenu = new LevelMenu(game);
-		JButton btnStart = new JButton("START");
-        btnStart.setPreferredSize(BUTTON_SIZE);
-        btnStart.setBackground(COLOR_BUTTON);
-        btnStart.setBorder(BORDER_BUTTON);
-        btnStart.setFocusPainted(false);
-        btnStart.setFont(fontBtn);
-        btnStart.setOpaque(false);
-        btnStart.addActionListener(new ActionListener() {
+		//lvlMenu = new LevelMenu(game);
+		optionMenu = new OptionPlaying(this);
+		settingMenu = new SettingMenu(this);
+		instruction = new Instruction(this);
+		
+		JButton btnPlay = new JButton("PLAY");
+        btnPlay.setPreferredSize(BUTTON_SIZE);
+        btnPlay.setBackground(COLOR_BUTTON);
+        btnPlay.setBorder(BORDER_BUTTON);
+        btnPlay.setFocusPainted(false);
+        btnPlay.setFont(fontBtn);
+        btnPlay.setOpaque(false);
+        btnPlay.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
             	running = false;
             	menuPanel.setVisible(false);
-            	game.getPanel().repaint();
-            	game.getPanel().setMenu(lvlMenu);
-            	game.getPanel().add(lvlMenu.getMenuPanel());
-            	
+            	optionMenu.setRunning(true);
+            	if(!Main.STARTPANEL.isAncestorOf(optionMenu.getMenuPanel())) {
+            		Main.STARTPANEL.add(optionMenu.getMenuPanel());
+            	}
+            	Main.STARTPANEL.repaint();
+            	Main.STARTPANEL.setMenu(optionMenu);
+
             }
         });
        
@@ -79,7 +89,19 @@ public class StartMenu extends Menu {
         btnInstruction.setFocusPainted(false);
         btnInstruction.setFont(fontBtn);
         btnInstruction.setOpaque(false);
-        //btnInstruction.setContentAreaFilled(false);
+        btnInstruction.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	running = false;
+            	menuPanel.setVisible(false);
+            	instruction.setRunning(true);
+            	if(!Main.STARTPANEL.isAncestorOf(instruction.getMenuPanel())) {
+            		Main.STARTPANEL.add(instruction.getMenuPanel());
+            	}
+            	Main.STARTPANEL.repaint();
+            	Main.STARTPANEL.setMenu(instruction);
+
+            }
+        });
         
         
         JButton btnSetting = new JButton("SETTINGS");
@@ -89,7 +111,19 @@ public class StartMenu extends Menu {
         btnSetting.setFocusPainted(false);
         btnSetting.setFont(fontBtn);
         btnSetting.setOpaque(false);
-        //btnSetting.setContentAreaFilled(false);
+        btnSetting.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	running = false;
+            	menuPanel.setVisible(false);
+            	settingMenu.setRunning(true);
+            	if(!Main.STARTPANEL.isAncestorOf(settingMenu.getMenuPanel())) {
+            		Main.STARTPANEL.add(settingMenu.getMenuPanel());
+            	}
+            	Main.STARTPANEL.repaint();
+            	Main.STARTPANEL.setMenu(settingMenu);
+
+            }
+        });
         
         JButton btnExit = new JButton("EXIT");
         btnExit.setPreferredSize(BUTTON_SIZE);
@@ -105,14 +139,14 @@ public class StartMenu extends Menu {
         });
         
        
-		menuPanel.add(btnStart);
+		menuPanel.add(btnPlay);
 		menuPanel.add(btnInstruction);
 		menuPanel.add(btnSetting);
 		menuPanel.add(btnExit);
 	
 		
 		menuPanel.setSize(PANEL_SIZE);
-		menuPanel.setLocation(Game.GAME_WIDTH/2 - PANEL_SIZE.width/2, Game.GAME_HEIGHT/2 - PANEL_SIZE.height/2);
+		menuPanel.setLocation(Main.GAME_WIDTH/2 - PANEL_SIZE.width/2, Main.GAME_HEIGHT/2 - PANEL_SIZE.height/2);
 		menuPanel.setVisible(running);
 		menuPanel.setOpaque(false);
 	}
@@ -121,12 +155,12 @@ public class StartMenu extends Menu {
 	public void render(Graphics g) {
 		g.setFont(fontTitle);
 		FontMetrics metrics = g.getFontMetrics(fontTitle);
-		int x = (Game.GAME_WIDTH - metrics.stringWidth(gameName)) / 2; 
+		int x = (Main.GAME_WIDTH - metrics.stringWidth(gameName)) / 2; 
 		int y = metrics.getAscent()+BUTTON_SIZE.height; 
 		g.drawString(gameName,x,y);
-		g.drawImage(fish1, fishSize/2, Game.GAME_HEIGHT/2-fishSize/2, fishSize, fishSize, menuPanel);
-		g.drawImage(fish2, Game.GAME_WIDTH- fishSize-fishSize/2,Game.GAME_HEIGHT/2-fishSize/2,fishSize,fishSize, menuPanel);
-		g.drawImage(intro, 0,Game.GAME_HEIGHT-fishSize,Game.GAME_WIDTH,fishSize, null);
+		g.drawImage(fish1, fishSize/2, Main.GAME_HEIGHT/2-fishSize/2, fishSize, fishSize, menuPanel);
+		g.drawImage(fish2, Main.GAME_WIDTH- fishSize-fishSize/2,Main.GAME_HEIGHT/2-fishSize/2,fishSize,fishSize, menuPanel);
+		g.drawImage(intro, 0,Main.GAME_HEIGHT-fishSize,Main.GAME_WIDTH,fishSize, null);
 	}
 
 	@Override
@@ -137,6 +171,7 @@ public class StartMenu extends Menu {
 	@Override
 	public void setRunning(boolean running) {
 		this.running = running;
+		menuPanel.setVisible(running);
 	}
 
 	@Override
@@ -150,8 +185,8 @@ public class StartMenu extends Menu {
 		
 	}
 
-	public LevelMenu getLvlMenu() {
-		return lvlMenu;
+	public OptionPlaying getOptionMenu() {
+		return optionMenu;
 	}
 
 

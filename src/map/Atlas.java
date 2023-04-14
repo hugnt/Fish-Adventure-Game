@@ -25,6 +25,7 @@ public class Atlas {
 	
 	private ArrayList<Pair<Integer, Integer>> lstPosCrab;
 	private ArrayList<Pair<Integer, Integer>> lstPosOcto;
+	private ArrayList<Pair<Integer, Integer>> lstPosGrid;
 	
 	public Atlas(String level) {
 		MAP_URL = level;
@@ -55,18 +56,21 @@ public class Atlas {
 		lstPosQuestion = new ArrayList<Pair<Integer, Integer>>();
 		lstPosCrab = new ArrayList<Pair<Integer, Integer>>();
 		lstPosOcto = new ArrayList<Pair<Integer, Integer>>();
+		lstPosGrid = new ArrayList<Pair<Integer, Integer>>();
+		
 		int flag = 0;
 		
 		for (int i = 0; i < img.getHeight(); i++) {
 			for (int j = 0; j < img.getWidth(); j++) {
 				Color color = new Color(img.getRGB(j, i));//get per pixel tile's color of img
 				int value = color.getRed();
-				System.out.println("value: "+value);
+//				System.out.println("value: "+value);
 				if(value >= 49)
 				{
-					//crab && octo
+					//crab && octo &&grid
 					if(value == 255) lstPosCrab.add(new Pair(j, i));
 					else if(value == 254) lstPosOcto.add(new Pair(j, i));
+					else if(value == 253) lstPosGrid.add(new Pair(j, i));
 					value = 6;
 				}
 				
@@ -123,6 +127,11 @@ public class Atlas {
 	public ArrayList<Pair<Integer, Integer>> getLstPosOcto() {
 		return lstPosOcto;
 	}
+	
+	public ArrayList<Pair<Integer, Integer>> getLstPosGrid() {
+		return lstPosGrid;
+	}
+
 
 
 	public int getPosLockX() {

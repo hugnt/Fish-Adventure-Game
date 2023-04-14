@@ -24,24 +24,33 @@ public class Lock {
 	private int x, y;
 	private int width, height;
 	private boolean unlock;
-	private String password;
+	private String password, password2;
+	private int currTyping;
+	private int limitTyping;
 	
 	private JPanel passwordPanel;
 	private JLabel label;
 	private JTextField input;
 	private JButton cfBtn;
 	
+	private boolean lose;
+	
+	
 	
 	private boolean isShowInput;
 	
 	
-	public Lock(int x, int y, int width, int height,String password) {
+	public Lock(int x, int y, int width, int height,String password, String password2, int limitTyping) {
 		super();
 		this.x = x;
 		this.y = y;
 		this.width = width;
 		this.height = height;
-		this.password = password.toLowerCase();
+		this.password = password.toLowerCase().replaceAll("\\s+", "");
+		this.password2 = password.toLowerCase().replaceAll("\\s+", "");
+		this.limitTyping = limitTyping;
+		
+		currTyping = 0;
 		
 		unlock = false;
 		passwordPanel = new JPanel();
@@ -50,7 +59,8 @@ public class Lock {
 		//passwordPanel.setOpaque(false);
 		
 		//label
-		label = new JLabel("Enter password: ");
+		label = new JLabel();
+		label.setText("Enter password ("+currTyping+"/"+limitTyping+")"+" :");
 		Font font = new Font("Arial", Font.PLAIN, (int)(11*Game.SCALE));
 		label.setPreferredSize(new Dimension(width, (int)((height-10)/3)));
 		label.setFont(font);
@@ -60,22 +70,28 @@ public class Lock {
 		input.setBorder(null);
 		input.setBackground(new Color(245, 243, 142, 255));
 		input.setPreferredSize(new Dimension(width, (int)((height-10)/3)));
-		input.addActionListener(new ActionListener() {
+		//enter
+		ActionListener inputHandle = new ActionListener() {
 		    public void actionPerformed(ActionEvent e) {
-		        String res = input.getText().toLowerCase();
-		        if(password.equals(res)) {
+		        String res = input.getText().toLowerCase().replaceAll("\\s+", "");
+		        if(res.isEmpty()) return;
+		        if(res.equals(password)||res.equals(password2)) {
 		        	unlock = true;
 		        	isShowInput = false;
 		        	input.setText("");
 		        	//System.out.println(unlock+" "+isShowInput);
 		        	System.out.println("Correct answer!!");
 		        }
-		        else {
+		        else{
+		        	currTyping ++;
+		        	input.setText("");
 		        	unlock = false;
 		        	System.out.println("Incorrect answer!!");
+		        	if(currTyping>limitTyping) lose = true;
 		        }
 		    }
-		});
+		};
+		input.addActionListener(inputHandle);
 		
 		//btn
 		cfBtn = new JButton("Confirm");
@@ -83,21 +99,7 @@ public class Lock {
 		cfBtn.setFocusPainted(false);
 		cfBtn.setBackground(new Color(226, 180, 54, 255));
 		cfBtn.setFont(font);
-		cfBtn.addActionListener(new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
-		        String res = input.getText().toLowerCase();
-		        if(password.equals(res)) {
-		        	unlock = true;
-		        	isShowInput = false;
-		        	//System.out.println(unlock+" "+isShowInput);
-		        	System.out.println("Correct answer!!");
-		        }
-		        else {
-		        	unlock = false;
-		        	System.out.println("Incorrect answer!!");
-		        }
-		    }
-		});
+		cfBtn.addActionListener(inputHandle);
 		
 		Border padding = BorderFactory.createEmptyBorder(5, 5, 5, 5);
 		passwordPanel.setBorder(padding);
@@ -111,6 +113,7 @@ public class Lock {
 	}
 	public void render(int xMapOffset) {
 		if(isShowInput) {
+			label.setText("Enter password ("+currTyping+"/"+limitTyping+")"+" :");
 			passwordPanel.setBounds(x - xMapOffset, y, width, height);
 			passwordPanel.setVisible(true);
 		}
@@ -131,6 +134,9 @@ public class Lock {
 	}
 	
 	
+	public boolean isLose() {
+		return lose;
+	}
 	public void setShowInput(boolean isShowInput) {
 		this.isShowInput = isShowInput;
 	}

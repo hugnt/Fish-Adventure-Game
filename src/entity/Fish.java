@@ -2,8 +2,11 @@ package entity;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 import main.Game;
 import root.IOHandler;
@@ -14,7 +17,8 @@ public class Fish{
 	private float x, y;
 	private float width, height;
 	private BufferedImage fishImg;
-	
+	private BufferedImage fishImgOri;
+	private BufferedImage fishImgFlip;
 	//Other Fish
 	private Fish otherFish;
 	
@@ -26,7 +30,7 @@ public class Fish{
 	private boolean moving;
 	
 	//constant
-	private final float denta = 2.0f;
+	private float denta = 1.5f;
 	
 	//Collision
 	private MoveHandler moveHandler;
@@ -46,6 +50,9 @@ public class Fish{
 	//trap
 	private boolean touchTrap;
 	
+	//enemy
+	private ArrayList<Enemy> enemy;
+	
 	public Fish(float x, float y, float width, float height, String color) {
 		super();
 		this.x = x;
@@ -54,14 +61,24 @@ public class Fish{
 		this.height = height;
 		moving = true;
 		
-		hitbox = new Rectangle2D.Float(x - xOffset, y - yOffset, 40* Game.SCALE, 26* Game.SCALE);
+		denta = denta*Float.parseFloat(IOHandler.getProperty("MOVE_STEP"))*Game.SCALE;
+		
+		hitbox = new Rectangle2D.Float(x - xOffset, y - yOffset, Game.TILES_DEFAULT_SIZE* Game.SCALE, 26* Game.SCALE);
 		
 		String fishColor = getFishColor(color);
-		fishImg = IOHandler.getImage(fishColor);
-		fishImg = fishImg.getSubimage(12, 20, 40, 26);
+		fishImg = IOHandler.getImage(fishColor).getSubimage(12, 20, 40, 26);
 		
+		//flip
+		AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+		tx.translate(-fishImg.getWidth(null), 0);
+		AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+		fishImgFlip = op.filter(fishImg, null);
+		
+		fishImgOri = fishImg;
 		moveHandler = new MoveHandler();
 		hintPos = new Pair<Integer, Integer> (0, 0);
+		
+		
 	}
 	
 	private String getFishColor(String color) {
@@ -80,15 +97,21 @@ public class Fish{
 		//moving = true;
 		float dentaX = 0, dentaY = 0;
 		
-		if (left && !right) dentaX -= denta;
-		else if (right && !left) dentaX += denta;
+		if (left && !right) {
+			dentaX -= denta;
+			fishImg = fishImgFlip;
+		}
+		else if (right && !left) {
+			dentaX += denta;
+			fishImg = fishImgOri;
+		}
 		
 		if (up && !down) dentaY -= denta;
 		else if (down && !up) dentaY += denta;
 		
 
 		//collision
-		if(moveHandler.isValidStep(hitbox.x + dentaX, hitbox.y + dentaY, hitbox.width-10, hitbox.height, mapData, unlock)) {
+		if(moveHandler.isValidStep(hitbox.x + dentaX, hitbox.y + dentaY, hitbox.width, hitbox.height, mapData, unlock)) {
 			if(dentaX!=0||dentaY!=0) {
 				if(otherFish.isMoving() == true){
 					hitbox.x += dentaX;
@@ -100,6 +123,8 @@ public class Fish{
 		else {
 			moving = false;
 		}
+		
+	
 		//check touch trap
 		if(moveHandler.isTouchTrap()) {
 			touchTrap=true;
@@ -150,6 +175,9 @@ public class Fish{
 	
 	
 	//getters & setters
+	public Pair<Float, Float> getFishPos() {
+		return new Pair(hitbox.x , hitbox.y);
+	}
 	public Pair<Integer, Integer> getHintPos() {
 		return hintPos;
 	}
@@ -164,6 +192,12 @@ public class Fish{
 	
 	public boolean isTouchTrap() {
 		return touchTrap;
+	}
+	
+
+	public void setEnemy(ArrayList<Enemy> enemy) {
+		this.enemy = enemy;
+		moveHandler.setEnemy(enemy);
 	}
 
 	public int[][] getMapData() {

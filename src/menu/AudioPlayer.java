@@ -48,6 +48,7 @@ public class AudioPlayer extends JPanel implements Runnable{
 		audioSlider.setMinorTickSpacing(10);
 		audioSlider.setPaintTicks(true);
 		audioSlider.setPaintLabels(true);
+		audioSlider.setOpaque(false);
 		audioSlider.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
@@ -59,6 +60,7 @@ public class AudioPlayer extends JPanel implements Runnable{
         });
 		add(lbVolumn, BorderLayout.NORTH);
 		add(audioSlider, BorderLayout.CENTER);
+		setOpaque(false);
 		
 		audioThread = new Thread(this);
 		audioThread.start();

@@ -51,7 +51,10 @@ public class ResultMenu extends Menu{
 		btnNextLevel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	
+            	game.end();
+				game.start(game.getCurrentLevel()+1);
+				resDialog.setVisible(false);
+				game.getPanel().requestFocus();
             }
         });
 
@@ -66,7 +69,7 @@ public class ResultMenu extends Menu{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				game.end();
-				game.start("map005.png");
+				game.start(game.getCurrentLevel());
 				resDialog.setVisible(false);
 				game.getPanel().requestFocus();
 				
@@ -86,7 +89,7 @@ public class ResultMenu extends Menu{
 			public void actionPerformed(ActionEvent e) {
 				game.end();
 				resDialog.setVisible(false);
-				var lvlMenu = ((StartMenu)game.getStartMenu()).getLvlMenu();
+				var lvlMenu = game.getLvlMenu();
 				game.getPanel().add(lvlMenu.getMenuPanel());
 				lvlMenu.setRunning(true);
             	game.getPanel().setMenu(lvlMenu);

@@ -16,10 +16,12 @@ import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
 import main.Game;
+import main.Main;
 import root.IOHandler;
 
 public class LevelMenu extends Menu{
@@ -30,59 +32,88 @@ public class LevelMenu extends Menu{
 	private Font fontTitle;
 	private JButton[] btnLvl;
 	private BufferedImage bgLvlMenu;
-	private final Dimension PANEL_SIZE = new Dimension(BUTTON_SIZE.width*5, BUTTON_SIZE.height*3+GAP_BETWEEN_BUTTON.height*3);
-	private Map<Integer, String> memLvl;
-	private String[] lvlUrl;
+	private final Dimension PANEL_SIZE = new Dimension(BUTTON_SIZE.width*5, BUTTON_SIZE.height*5+GAP_BETWEEN_BUTTON.height*5);
+
 	
 	public LevelMenu(Game game) {
-		//running = true;
+		running = true;
 		bgLvlMenu = IOHandler.getImage("seaCave.gif");
-		memLvl = new HashMap<>();
-		lvlUrl = new String[]{
-			"map005.png",
-			"map006.png",
-			"map007.png",
-			"map008.png",
-			"map008.png",
-			"map010.png"
-		};
-		
-		
+
 		menuPanel = new JPanel(new GridBagLayout());
-	    GridBagConstraints c = new GridBagConstraints();
-	    c.insets = new Insets(10, 10, 10, 10);
-	    
-		//menuPanel.setLayout(new FlowLayout(FlowLayout.CENTER, GAP_BETWEEN_BUTTON.width, GAP_BETWEEN_BUTTON.height));
+	    		
 		menuPanel.setFocusable(true);
 		fontBtn = IOHandler.getFont("RussoOne-Regular.ttf").deriveFont(Font.PLAIN, (float)(BUTTON_SIZE.height/3));;
 		fontTitle = IOHandler.getFont("RussoOne-Regular.ttf").deriveFont(Font.PLAIN, (float)(BUTTON_SIZE.height/2));
-		btnLvl = new JButton[numberOfMap];
 		
-		for (int i = 0; i < numberOfMap; i++) {
-			btnLvl[i] = new JButton("Level "+(i+1));
+		JLabel titleLabel = new JLabel("CHOOSE LEVEL");
+	    titleLabel.setFont(fontTitle);
+		GridBagConstraints c = new GridBagConstraints();
+		c.insets = new Insets(20, 0, 20, 0);
+		c.gridx = 0;
+	    c.gridy = 0;
+	    c.gridwidth = GridBagConstraints.REMAINDER; // Chiếm hết số cột còn lại
+        c.anchor = GridBagConstraints.CENTER; 
+        menuPanel.add(titleLabel, c);
+		
+        GridBagConstraints cb1 = new GridBagConstraints();
+        cb1.insets = new Insets(10, 10, 10, 10);
+		btnLvl = new JButton[game.getTotalLevel()+1];
+		for (int i = 0; i < game.getTotalLevel(); i++) {
+			final int level = i+1;
+			btnLvl[i] = new JButton("Level "+level);
+			btnLvl[i].setBorder(BORDER_BUTTON);
 	        btnLvl[i].setPreferredSize(BUTTON_SIZE);
 	        btnLvl[i].setBackground(COLOR_BUTTON);
-	        btnLvl[i].setBorder(BORDER_BUTTON);
+	        
 	        btnLvl[i].setFocusPainted(false);
 	        btnLvl[i].setFont(fontBtn);
 	        btnLvl[i].setOpaque(false);
-	        c.gridx = i % 3;
-            c.gridy = i / 3;
-	        menuPanel.add(btnLvl[i], c);
+	        cb1.gridx = i % 3;
+            cb1.gridy = i / 3+1;
+	        menuPanel.add(btnLvl[i], cb1);
 	        
-	        memLvl.put(i, lvlUrl[i]);
-	        final String lvlUrl = memLvl.get(i);
 			btnLvl[i].addActionListener(new ActionListener() {
 	            public void actionPerformed(ActionEvent e) {
-	            	running = false;
 	            	menuPanel.setVisible(false);
-	            	game.start(lvlUrl);
+	            	running = false;
+	            	game.getPanel().repaint();
+//	            	game.getPanel().revalidate();
+	            	game.start(level);
+	            	
 	            }
 	        });
 		}
 		
+		GridBagConstraints cb2 = new GridBagConstraints();
+        cb2.gridx = 0;
+	    cb2.gridy = 6;
+	    cb2.gridwidth = GridBagConstraints.REMAINDER; // Chiếm hết số cột còn lại
+	    cb2.anchor = GridBagConstraints.CENTER; 
+	    cb2.insets = new Insets(20, 0, 20, 0);
+	    
+		JButton btnBack = new JButton("<< Back");
+		btnBack.setBorder(BORDER_BUTTON);
+		btnBack.setPreferredSize(BUTTON_SIZE);
+		btnBack.setBackground(COLOR_BUTTON);
+		btnBack.setFocusPainted(false);
+		btnBack.setFont(fontBtn);
+		btnBack.setOpaque(false);
+		btnBack.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				running = false;
+            	menuPanel.setVisible(false);
+            	game.getPanel().setVisible(false);
+				Main.STARTPANEL.setVisible(true);
+				Main.STARTPANEL.repaint();
+				Main.STARTPANEL.revalidate();
+				
+			}
+		});
+		menuPanel.add(btnBack, cb2);
+		
 		menuPanel.setSize(PANEL_SIZE);
-		menuPanel.setLocation(Game.GAME_WIDTH/2 - PANEL_SIZE.width/2, Game.GAME_HEIGHT/2 - PANEL_SIZE.height/2);
+		menuPanel.setLocation(Main.GAME_WIDTH/2 - PANEL_SIZE.width/2, Main.GAME_HEIGHT/2 - PANEL_SIZE.height/2);
 		menuPanel.setVisible(running);
 		menuPanel.setOpaque(false);
 		
@@ -90,13 +121,7 @@ public class LevelMenu extends Menu{
 	
 	@Override
 	public void render(Graphics g) {
-		g.drawImage(bgLvlMenu, 0, 0,Game.GAME_WIDTH, Game.GAME_HEIGHT, null);
-		g.setFont(fontTitle);
-		FontMetrics metrics = g.getFontMetrics(fontTitle);
-		int x = (Game.GAME_WIDTH - metrics.stringWidth(title)) / 2; 
-		int y = metrics.getAscent()+BUTTON_SIZE.height*4; 
-		g.drawString(title,x,y);
-		
+		g.drawImage(bgLvlMenu, 0, 0,Main.GAME_WIDTH, Main.GAME_HEIGHT, null);	
 	}
 	@Override
 	public boolean isRunning() {
@@ -118,10 +143,7 @@ public class LevelMenu extends Menu{
 		
 	}
 	
-	public String getSelectedLvl(int i) {
-		return memLvl.get(i);
-	}
-	
+
 	public JButton[] getBtnLvl() {
 		return btnLvl;
 	}

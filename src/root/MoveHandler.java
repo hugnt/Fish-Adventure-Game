@@ -3,7 +3,9 @@ package root;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 
+import entity.Enemy;
 import entity.Fish;
 import main.Game;
 import main.Panel;
@@ -23,10 +25,20 @@ public class MoveHandler implements KeyListener {
 	//touching trap
 	private boolean touchTrap;
 	
+	//enemy
+	private ArrayList<Enemy> enemy;
+	
+	//fish
+	private ArrayList<Pair<Float, Float>> fishPos;
+	private boolean enemyHandle;
+	private boolean touchFish;
 	
 	public MoveHandler() {
 		hintPos = new Pair<Integer, Integer> (0, 0);
 		lockPos = new Pair<Integer, Integer> (0, 0);
+		enemy = new ArrayList<Enemy>();
+		fishPos = new ArrayList<Pair<Float, Float>>();
+		enemyHandle = false;
 	}
 	
 	public MoveHandler(Fish f1, Fish f2,Panel panel) {
@@ -73,7 +85,25 @@ public class MoveHandler implements KeyListener {
 		
 		int value = mapData[(int)yIndex][(int)xIndex];
 		
+		//check  enemy touch fish
+		if(enemyHandle) {
+			for(var fish:fishPos) {
+				float xFishA = fish.first;
+				float yFishA = fish.second;
+				
+				float xFishB = xFishA + 40* Game.SCALE;
+				float yFishC = yFishA + 26* Game.SCALE;
+				
+				if((x>=xFishA&&x<=xFishB)&&(y>=yFishA&&y<=yFishC)) {
+					touchFish = true;
+					return false;
+				}
+				
+			}
+		}
 		
+		
+	
 		//check in plant
 		if(value == 48||value ==47||value == 46) return true;
 		
@@ -142,7 +172,22 @@ public class MoveHandler implements KeyListener {
 	public boolean isTouchTrap() {
 		return touchTrap;
 	}
+	public boolean isTouchFish() {
+		return touchFish;
+	}
 
+
+	public void setEnemyHandle(boolean enemyHandle) {
+		this.enemyHandle = enemyHandle;
+	}
+
+	public void setFishPos(ArrayList<Pair<Float, Float>> fishPos) {
+		this.fishPos = fishPos;
+	}
+
+	public void setEnemy(ArrayList<Enemy> enemy) {
+		this.enemy = enemy;
+	}
 
 	@Override
 	public void keyTyped(KeyEvent e) {

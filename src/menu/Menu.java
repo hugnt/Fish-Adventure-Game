@@ -9,10 +9,11 @@ import javax.swing.JPanel;
 import javax.swing.border.Border;
 
 import main.Game;
+import main.Main;
 
 public abstract class Menu {
-	protected final static Dimension BUTTON_SIZE = new Dimension((int)(150*Game.SCALE),(int)(50*Game.SCALE));
-	protected final static Dimension GAP_BETWEEN_BUTTON = new Dimension((int)(20*Game.SCALE),(int)(20*Game.SCALE));
+	protected final static Dimension BUTTON_SIZE = new Dimension((int)(150*Main.SCALE),(int)(50*Main.SCALE));
+	protected final static Dimension GAP_BETWEEN_BUTTON = new Dimension((int)(20*Main.SCALE),(int)(20*Main.SCALE));
 	protected final Color COLOR_BUTTON = new Color(41, 171, 226, 117);
 	protected final Border BORDER_BUTTON =  BorderFactory.createLineBorder(Color.BLACK, 2);
 	protected JPanel menuPanel;

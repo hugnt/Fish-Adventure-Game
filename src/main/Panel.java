@@ -28,13 +28,16 @@ public class Panel extends JPanel{
 		setPreferredSize(size);
 		setLayout(null);
 	}
+	
+	
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);//pre-work clean surface
-		g.drawImage(background, 0, 0, Game.GAME_WIDTH, Game.GAME_HEIGHT, null);
-		if(game.isRunning()) {
+		g.drawImage(background, 0, 0, width, height, null);
+		if(game!=null&&game.isRunning()) {
 			game.render(g);
 		}
 		else if(menu!=null&&menu.isRunning()){
+//			System.out.println("MENU-PANEl");
 			menu.render(g);
 		}
 		else {

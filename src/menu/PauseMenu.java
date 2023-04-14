@@ -24,6 +24,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import main.Game;
+import main.Main;
 import root.IOHandler;
 
 public class PauseMenu extends Menu{
@@ -79,7 +80,7 @@ public class PauseMenu extends Menu{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				game.end();
-				game.start("map005.png");
+				game.start(game.getCurrentLevel());
 				pauseDialog.setVisible(false);
 				game.getPanel().requestFocus();
 				
@@ -99,7 +100,7 @@ public class PauseMenu extends Menu{
 			public void actionPerformed(ActionEvent e) {
 				game.end();
 				pauseDialog.setVisible(false);
-				var lvlMenu = ((StartMenu)game.getStartMenu()).getLvlMenu();
+				var lvlMenu = game.getLvlMenu();
 				game.getPanel().add(lvlMenu.getMenuPanel());
 				lvlMenu.setRunning(true);
             	game.getPanel().setMenu(lvlMenu);
@@ -109,7 +110,7 @@ public class PauseMenu extends Menu{
 		});
         
         pauseDialog.add(lbPaused);
-        pauseDialog.add(game.getAudioPlayer());
+        pauseDialog.add(Main.AUDIOPLAYER);
         pauseDialog.add(btnResume);
         pauseDialog.add(btnRestart);
         pauseDialog.add(btnExitToMap);
