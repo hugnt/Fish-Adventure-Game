@@ -3,6 +3,7 @@ package root;
 import java.sql.*;
 import java.util.ArrayList;
 
+import main.Main;
 import models.HintEntity;
 import models.LevelEntity;
 
@@ -19,12 +20,12 @@ public class AppDbContext {
 	
 	public AppDbContext() throws SQLException, ClassNotFoundException {
 		
-		DRIVER_CLASS = IOHandler.getProperty("DRIVER_CLASS");
-		HOST_NAME = IOHandler.getProperty("HOST_NAME");
-		PORT = IOHandler.getProperty("PORT");
-		DB_NAME = IOHandler.getProperty("DB_NAME");
-		USER = IOHandler.getProperty("USER");
-		PASS = IOHandler.getProperty("PASS");
+		DRIVER_CLASS = IOHandler.getProperty("DRIVER_CLASS",Main.CONFIG_FILE).trim();
+		HOST_NAME = IOHandler.getProperty("HOST_NAME",Main.CONFIG_FILE).trim();
+		PORT = IOHandler.getProperty("PORT",Main.CONFIG_FILE).trim();
+		DB_NAME = IOHandler.getProperty("DB_NAME",Main.CONFIG_FILE).trim();
+		USER = IOHandler.getProperty("USER",Main.CONFIG_FILE).trim();
+		PASS = IOHandler.getProperty("PASS",Main.CONFIG_FILE).trim();
 		
 		lvlEntity = new ArrayList<LevelEntity>();
 		hintEntity = new ArrayList<HintEntity>();

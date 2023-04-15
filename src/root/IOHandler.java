@@ -4,9 +4,13 @@ import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.time.LocalDateTime;
 import java.util.Properties;
 
 import javax.imageio.ImageIO;
@@ -20,6 +24,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 
 public abstract class IOHandler {
 	private static final String FILE_CONFIG = "\\config.properties";
+	private static final String FILE_UPDATE = "\\update.properties";
 	
 	public static BufferedImage getImage(String fileName) {
 		BufferedImage img = null;
@@ -89,13 +94,15 @@ public abstract class IOHandler {
 			}
 	        return clip;
 	    }
-	public static String getProperty(String key) {
+	 
+	public static String getProperty(String key, String fileName) {
 		String res = null;
+		fileName = "\\"+ fileName;
 		Properties properties = new Properties();
         InputStream inputStream = null;
         try {
             String currentDir = System.getProperty("user.dir");
-            inputStream = new FileInputStream(currentDir + FILE_CONFIG);
+            inputStream = new FileInputStream(currentDir + fileName);
 
             // load properties from file
             properties.load(inputStream);
@@ -117,6 +124,39 @@ public abstract class IOHandler {
         }
 		return res;
 	}
+	public static void setProperty(String key, String value, String fileName) {
+	    Properties properties = new Properties();
+	    fileName = "\\"+ fileName;
+	    OutputStream outputStream = null;
+	    try {
+	        String currentDir = System.getProperty("user.dir");
+	        File configFile = new File(currentDir + fileName);
+
+	        // load properties from file
+	        FileInputStream inputStream = new FileInputStream(configFile);
+	        properties.load(inputStream);
+
+	        // update property value
+	        properties.setProperty(key, value);
+
+	        // save properties to file
+	        outputStream = new FileOutputStream(configFile);
+	        properties.store(outputStream, "Update time: "+LocalDateTime.now());
+
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    } finally {
+	        // close objects
+	        try {
+	            if (outputStream != null) {
+	                outputStream.close();
+	            }
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+	    }
+	}
+	
 	
 	
 }

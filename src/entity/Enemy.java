@@ -1,23 +1,19 @@
 package entity;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import javax.swing.JPanel;
 
 import main.Game;
-import menu.ResultMenu;
 import root.IOHandler;
 import root.MoveHandler;
 import root.Pair;
 
 public class Enemy {
 	private float x, y;
-	private float width, height;
 	private BufferedImage enemyImg;
 	private BufferedImage enemyImgOri;
 	private BufferedImage enemyImgFlip;
@@ -27,7 +23,6 @@ public class Enemy {
 	private float denta = 1.0f*Game.SCALE;
 	private float dentaX = 0;
 	private float dentaY = 0;
-	private boolean horizon = true;
 	
 	
 	//Collision
@@ -41,10 +36,8 @@ public class Enemy {
 		super();
 		this.x = x;
 		this.y = y;
-		this.width = width;
-		this.height = height;
 		this.enemyImg = IOHandler.getImage(img);
-		this.horizon = horizon;
+
 		if(horizon) dentaX = denta;
 		else dentaY = denta;
 		enemyImg = enemyImg.getSubimage(0, 0, width, height);
@@ -88,9 +81,6 @@ public class Enemy {
 		}
 		
 	
-	}
-	public Pair<Float, Float> getPos(){
-		return new Pair(x, y);
 	}
 
 	public void setFishPos(ArrayList<Pair<Float, Float>> fishPos) {

@@ -1,14 +1,13 @@
 package entity;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 
 import main.Game;
+import main.Main;
 import root.IOHandler;
 import root.MoveHandler;
 import root.Pair;
@@ -50,8 +49,6 @@ public class Fish{
 	//trap
 	private boolean touchTrap;
 	
-	//enemy
-	private ArrayList<Enemy> enemy;
 	
 	public Fish(float x, float y, float width, float height, String color) {
 		super();
@@ -61,7 +58,7 @@ public class Fish{
 		this.height = height;
 		moving = true;
 		
-		denta = denta*Float.parseFloat(IOHandler.getProperty("MOVE_STEP"))*Game.SCALE;
+		denta = denta*Float.parseFloat(IOHandler.getProperty("MOVE_STEP", Main.CONFIG_FILE).trim())*Game.SCALE;
 		
 		hitbox = new Rectangle2D.Float(x - xOffset, y - yOffset, Game.TILES_DEFAULT_SIZE* Game.SCALE, 26* Game.SCALE);
 		
@@ -176,8 +173,9 @@ public class Fish{
 	
 	//getters & setters
 	public Pair<Float, Float> getFishPos() {
-		return new Pair(hitbox.x , hitbox.y);
+		return new Pair<Float, Float>(hitbox.x , hitbox.y);
 	}
+	
 	public Pair<Integer, Integer> getHintPos() {
 		return hintPos;
 	}
@@ -194,11 +192,6 @@ public class Fish{
 		return touchTrap;
 	}
 	
-
-	public void setEnemy(ArrayList<Enemy> enemy) {
-		this.enemy = enemy;
-		moveHandler.setEnemy(enemy);
-	}
 
 	public int[][] getMapData() {
 		return mapData;

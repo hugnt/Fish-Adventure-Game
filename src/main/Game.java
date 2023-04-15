@@ -8,14 +8,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 import java.sql.SQLException;
 import java.util.*;
 
-import javax.sound.sampled.Clip;
 import javax.swing.BorderFactory;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 
 import entity.Enemy;
@@ -23,13 +19,10 @@ import entity.Fish;
 import entity.Lock;
 import entity.Hint;
 import map.Atlas;
-import menu.AudioPlayer;
 import menu.LevelMenu;
 import menu.Menu;
-import menu.OptionPlaying;
 import menu.PauseMenu;
 import menu.ResultMenu;
-import menu.StartMenu;
 import models.HintEntity;
 import models.LevelEntity;
 import root.AppDbContext;
@@ -78,15 +71,16 @@ public class Game implements Runnable {
 	private int leftBorder;
 	private int rightBorder;
 
+	//level status
 	private int currentLevel;
-	
+	private int lastLevel;
 	
 	//map&& locks and hints
 	private ArrayList<LevelEntity> lvlEntity;
 	private ArrayList<HintEntity> hintEntity;
 
 	public Game() {
-		importConfig();
+		importGameConfig();
 		lvlMenu = new LevelMenu(this);
    
 		panel = new Panel(this, GAME_WIDTH, GAME_HEIGHT);// create panel
@@ -110,21 +104,62 @@ public class Game implements Runnable {
 		        }
 		    }
 		});
-		
-		
-
 	};
-	
 
-	private void importConfig() {
-		TILES_DEFAULT_SIZE = Integer.parseInt(IOHandler.getProperty("TILES_DEFAULT_SIZE").trim());
-		SCALE = Float.parseFloat(IOHandler.getProperty("SCALE").trim());
-		TILES_IN_WIDTH = Integer.parseInt(IOHandler.getProperty("TILES_IN_WIDTH").trim());
+	public void start(int level) {
+		currentLevel = level;
+		lastLevel = Integer.parseInt(IOHandler.getProperty("LAST_LEVEL_PLAYING",Main.UPDATE_FILE).trim());
+		win = lose = false;
+		map = new Atlas(getLevel(level));
+		
+		initCharacter();
+		initHint();
+		initLock();
+		initEnemy();
+		importPauseMenu();
+
+		movingEvent = new MoveHandler(fish1, fish2);
+		panel.addKeyListener(movingEvent);
+		
+		running = true;
+		
+		// thread
+		displayThread = new Thread(this);
+		displayThread.start();
+	}
+
+	public void end() {
+		displayThread.interrupt();
+		panel.setIgnoreRepaint(true);
+		panel.removeAll();
+		running = false;
+		
+	}
+
+	public void render(Graphics g) {
+		for (var amee : enemy) {
+			amee.render(g, xMapOffset);
+		}
+		for (var q : lstHint) {
+			q.render(g, xMapOffset);
+		}
+		map.render(g, xMapOffset);
+		lock.render(xMapOffset);
+		fish1.render(g, xMapOffset);
+		fish2.render(g, xMapOffset);
+
+	}
+
+	private void importGameConfig() {
+		TILES_DEFAULT_SIZE = Integer.parseInt(IOHandler.getProperty("TILES_DEFAULT_SIZE", Main.CONFIG_FILE).trim());
+		SCALE = Float.parseFloat(IOHandler.getProperty("SCALE", Main.CONFIG_FILE).trim());
+		TILES_IN_WIDTH = Integer.parseInt(IOHandler.getProperty("TILES_IN_WIDTH", Main.CONFIG_FILE).trim());
 		TILES_SIZE = (int) (TILES_DEFAULT_SIZE * SCALE);
 		GAME_WIDTH = TILES_SIZE * TILES_IN_WIDTH;
 		GAME_HEIGHT = TILES_SIZE * TILES_IN_HEIGHT;
-		FPS_SET = Integer.parseInt(IOHandler.getProperty("FPS_SET").trim());
-
+		FPS_SET = Integer.parseInt(IOHandler.getProperty("FPS_SET", Main.CONFIG_FILE).trim());
+		
+		lastLevel = Integer.parseInt(IOHandler.getProperty("LAST_LEVEL_PLAYING",Main.UPDATE_FILE).trim());		
 		leftBorder = (int) (0.4 * GAME_WIDTH);
 		rightBorder = (int) (0.6 * GAME_WIDTH);
 		
@@ -141,33 +176,26 @@ public class Game implements Runnable {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
-//		for (var hint : hintEntity) {
-//			System.out.println(hint.getLevelId()+": "+hint.getContent());
-//		}
-		
+				
 		
 	}
 
-	public void start(int level) {
-		currentLevel = level;
-		win = lose = false;
-		map = new Atlas(getLevel(level));
+	private void initCharacter() {
 		fish1 = new Fish(TILES_SIZE * 2, TILES_SIZE * 6, 64 * SCALE, 64 * SCALE, "red");
 		fish2 = new Fish(TILES_SIZE * 2, TILES_SIZE * 16, 64 * SCALE, 64 * SCALE, "blue");
 		fish1.setOtherFish(fish2);
 		fish2.setOtherFish(fish1);
 		fish1.setMapData(map.getMapData());
 		fish2.setMapData(map.getMapData());
-
-		
+	}
+	
+	private void initHint() {
 		var lstHintContent = new ArrayList<String>();
 		for (var hint : hintEntity) {
-			if(hint.getLevelId()==level) {
+			if(hint.getLevelId()==currentLevel) {
 				lstHintContent.add(hint.getContent());
 			}
 		}
-		
 		lstHint = new ArrayList<Hint>();
 		memHint = new HashMap<>();
 		ArrayList<Pair<Integer, Integer>> lstPosHint = map.getLstPosQuestion();
@@ -178,44 +206,20 @@ public class Game implements Runnable {
 					TILES_SIZE, TILES_SIZE, lstHintContent.get(i)));
 			i++;
 		}
-		
-		String key1 = lvlEntity.get(level-1).getKeyAnswer();
-		String key2 = lvlEntity.get(level-1).getKeyAnswer2();
-		int limitTyping =  lvlEntity.get(level-1).getLimitTyping();
+	}
+	
+	private void initLock() {
+		String key1 = lvlEntity.get(currentLevel-1).getKeyAnswer();
+		String key2 = lvlEntity.get(currentLevel-1).getKeyAnswer2();
+		int limitTyping =  lvlEntity.get(currentLevel-1).getLimitTyping();
 		lock = new Lock(TILES_SIZE * map.getPosLockX(), TILES_SIZE * map.getPosLockY(), TILES_SIZE * 4, TILES_SIZE * 2,
 				key1, key2, limitTyping);
 		
 		panel.add(lock.getPasswordPanel());
-
-		movingEvent = new MoveHandler(fish1, fish2, panel);
-		panel.addKeyListener(movingEvent);
-		
-		
-		Font fontBtn = IOHandler.getFont("RussoOne-Regular.ttf").deriveFont(Font.PLAIN, 14f);;
-		
-		JButton btnPause = new JButton("| |");
-		btnPause.setFocusPainted(false);
-        btnPause.setOpaque(false);
-        btnPause.setForeground(new Color(18,219,242,255));
-        btnPause.setBounds((int)(GAME_WIDTH-TILES_SIZE*1.5),(int)(TILES_SIZE/3), TILES_SIZE, TILES_SIZE);
-        btnPause.setFont(fontBtn);
-        btnPause.setBackground(new Color(41,171,226,255));
-        btnPause.setBorder(BorderFactory.createLineBorder(new Color(18,219,242,255), 2));
-        btnPause.setMargin(new Insets(0,0, 0, 0));
-        
-        //pauseMenu.getPauseDialog().dispose();
-		
-        PauseMenu pauseMenu = new PauseMenu(Game.this);
-        btnPause.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				pauseMenu.setRunning(running);
-			}
-		});
-        panel.add(btnPause);
-        
-        
-        //enemy
+	}
+	
+	private void initEnemy() {
+		 //enemy
         Enemy.mapData = map.getMapData();
         enemy = new ArrayList<Enemy>();
         var lstPosCrab = map.getLstPosCrab();
@@ -231,38 +235,29 @@ public class Game implements Runnable {
     	   	enemy.add(new Enemy(TILES_SIZE *g.first, TILES_SIZE *g.second, 560, 560, "grid.png", false));
        
        	touchEnemy = false;
-        
-		running = true;
-		// thread
-		displayThread = new Thread(this);
-		displayThread.start();
-
-	}
-
-	public void end() {
-		displayThread.interrupt();
-		panel.setIgnoreRepaint(true);
-		panel.removeAll();
-		running = false;
-		
-	}
-
-	public void render(Graphics g) {
-		
-		for (var amee : enemy) {
-			amee.render(g, xMapOffset);
-		}
-		for (var q : lstHint) {
-			q.render(g, xMapOffset);
-		}
-		map.render(g, xMapOffset);
-		lock.render(xMapOffset);
-		fish1.render(g, xMapOffset);
-		fish2.render(g, xMapOffset);
-
 	}
 	
-	
+	private void importPauseMenu() {
+		Font fontBtn = IOHandler.getFont("RussoOne-Regular.ttf").deriveFont(Font.PLAIN, 14f);;
+		JButton btnPause = new JButton("| |");
+		btnPause.setFocusPainted(false);
+        btnPause.setOpaque(false);
+        btnPause.setForeground(new Color(18,219,242,255));
+        btnPause.setBounds((int)(GAME_WIDTH-TILES_SIZE*1.5),(int)(TILES_SIZE/3), TILES_SIZE, TILES_SIZE);
+        btnPause.setFont(fontBtn);
+        btnPause.setBackground(new Color(41,171,226,255));
+        btnPause.setBorder(BorderFactory.createLineBorder(new Color(18,219,242,255), 2));
+        btnPause.setMargin(new Insets(0,0, 0, 0));
+		
+        PauseMenu pauseMenu = new PauseMenu(Game.this);
+        btnPause.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				pauseMenu.setRunning(running);
+			}
+		});
+        panel.add(btnPause);
+	}
 
 	private void updateLock() {
 		if (fish1.isTouchLock() || fish2.isTouchLock()) {
@@ -293,6 +288,13 @@ public class Game implements Runnable {
 		
 		if(lock.isUnlock()) {
 			win = true;
+			if(currentLevel==getTotalLevel()) return;
+			else if(currentLevel==lastLevel) {
+				lastLevel+=1;
+				IOHandler.setProperty("LAST_LEVEL_PLAYING", Integer.toString(lastLevel), Main.UPDATE_FILE);
+				((LevelMenu) lvlMenu).update();
+			}
+			
 		}
 		else if(fish1.isTouchTrap()||fish2.isTouchTrap()||touchEnemy||lock.isLose()) {
 			lose = true;
@@ -370,7 +372,7 @@ public class Game implements Runnable {
 
 			if (System.currentTimeMillis() - lastCheck >= 1000) {
 				lastCheck = System.currentTimeMillis();
-//				System.out.println("FPS: " + frames);
+				System.out.println("FPS: " + frames);
 				frames = 0;
 			}
 		}
@@ -416,6 +418,11 @@ public class Game implements Runnable {
 
 	public int getCurrentLevel() {
 		return currentLevel;
+	}
+
+
+	public int getLastLevel() {
+		return lastLevel;
 	}
 
 

@@ -4,24 +4,17 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.FloatControl;
-import javax.swing.BorderFactory;
+
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
+
 import javax.swing.SwingConstants;
-import javax.swing.border.Border;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
 import main.Game;
 import main.Main;
@@ -29,7 +22,6 @@ import root.IOHandler;
 
 public class PauseMenu extends Menu{
 	private final Dimension PANEL_SIZE = new Dimension(BUTTON_SIZE.width*2, BUTTON_SIZE.height*5+GAP_BETWEEN_BUTTON.height*6);
-	private Font fontBtn;
 	private Font fontTitle;
 	private final String title = "PAUSED";
 	private JDialog pauseDialog;
@@ -41,7 +33,9 @@ public class PauseMenu extends Menu{
 		
 		pauseDialog.setLayout(new FlowLayout(FlowLayout.CENTER, GAP_BETWEEN_BUTTON.width, GAP_BETWEEN_BUTTON.height-10));
 		pauseDialog.setFocusable(true);
-		fontBtn = IOHandler.getFont("RussoOne-Regular.ttf").deriveFont(Font.PLAIN, (float)(BUTTON_SIZE.height/3));;
+        pauseDialog.getContentPane().setBackground(new Color(121,204,213,255));
+		pauseDialog.getRootPane().setBorder(BORDER_PANEL);
+	
 		fontTitle = IOHandler.getFont("RussoOne-Regular.ttf").deriveFont(Font.PLAIN, (float)(BUTTON_SIZE.height/1.5));
 		
 		JLabel lbPaused = new JLabel(title);
@@ -51,13 +45,7 @@ public class PauseMenu extends Menu{
 		lbPaused.setFont(fontTitle);
 		lbPaused.setOpaque(false);
 		
-		JButton btnResume = new JButton("RESUME");
-		btnResume.setPreferredSize(BUTTON_SIZE);
-		btnResume.setBackground(COLOR_BUTTON);
-        btnResume.setBorder(BORDER_BUTTON);
-        btnResume.setFocusPainted(false);
-        btnResume.setFont(fontBtn);
-        btnResume.setOpaque(false);
+		JButton btnResume = new ButtonMenu("RESUME");
         btnResume.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -69,13 +57,7 @@ public class PauseMenu extends Menu{
 
        
         
-        JButton btnRestart = new JButton("RESTART");
-        btnRestart.setPreferredSize(BUTTON_SIZE);
-        btnRestart.setBackground(COLOR_BUTTON);
-        btnRestart.setBorder(BORDER_BUTTON);
-        btnRestart.setFocusPainted(false);
-        btnRestart.setFont(fontBtn);
-        btnRestart.setOpaque(false);
+        JButton btnRestart = new ButtonMenu("RESTART");
         btnRestart.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -88,13 +70,7 @@ public class PauseMenu extends Menu{
 		});
         
         
-        JButton btnExitToMap = new JButton("EXIT TO MAP");
-        btnExitToMap.setPreferredSize(BUTTON_SIZE);
-        btnExitToMap.setBackground(COLOR_BUTTON);
-        btnExitToMap.setBorder(BORDER_BUTTON);
-        btnExitToMap.setFocusPainted(false);
-        btnExitToMap.setFont(fontBtn);
-        btnExitToMap.setOpaque(false);
+        JButton btnExitToMap = new ButtonMenu("EXIT TO MAP");
         btnExitToMap.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {

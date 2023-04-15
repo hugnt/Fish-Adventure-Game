@@ -7,7 +7,6 @@ import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
 
 import menu.Menu;
-import menu.StartMenu;
 import root.IOHandler;
 
 public class Panel extends JPanel{

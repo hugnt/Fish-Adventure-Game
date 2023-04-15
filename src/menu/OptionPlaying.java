@@ -1,9 +1,8 @@
 package menu;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.FontMetrics;
+
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -11,14 +10,11 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.util.HashMap;
-import java.util.Map;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.border.Border;
+
 
 import main.Game;
 import main.Main;
@@ -26,16 +22,12 @@ import root.IOHandler;
 
 public class OptionPlaying extends Menu{
 	
-	private int numberOfMap = 6;
-	private final String title = "CHOOSE LEVEL";
-	private Font fontBtn;
+	private final String title = "CHOOSE MODE";
 	private Font fontTitle;
-	private JButton[] btnLvl;
 	private BufferedImage bgLvlMenu;
 	private final Dimension PANEL_SIZE = new Dimension(BUTTON_SIZE.width*5, BUTTON_SIZE.height*5+GAP_BETWEEN_BUTTON.height*5);
 	
 	private Game game;
-	private LevelMenu lvlMenu;
 	
 	public OptionPlaying(StartMenu startMenu) {
 		running = true;
@@ -43,10 +35,9 @@ public class OptionPlaying extends Menu{
 		menuPanel = new JPanel(new GridBagLayout());
 		
 		menuPanel.setFocusable(true);
-		fontBtn = IOHandler.getFont("RussoOne-Regular.ttf").deriveFont(Font.PLAIN, (float)(BUTTON_SIZE.height/3));;
-		fontTitle = IOHandler.getFont("RussoOne-Regular.ttf").deriveFont(Font.PLAIN, (float)(BUTTON_SIZE.height/2));
+		fontTitle = FONT_TITLE.deriveFont(Font.PLAIN, (float)(BUTTON_SIZE.height/2));
 		
-		JLabel titleLabel = new JLabel("CHOOSE MODE");
+		JLabel titleLabel = new JLabel(title);
 	    titleLabel.setFont(fontTitle);
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = new Insets(20, 0, 20, 0);
@@ -57,19 +48,14 @@ public class OptionPlaying extends Menu{
         menuPanel.add(titleLabel, c);
 		
       
+        //btn-mode
+        //mode 1
 		GridBagConstraints cb = new GridBagConstraints();
         cb.gridx = 0;
 	    cb.gridy = 1;
-	    //cb.gridwidth = GridBagConstraints.REMAINDER; // Chiếm hết số cột còn lại
 	    cb.anchor = GridBagConstraints.CENTER; 
 	    cb.insets = new Insets(20, 0, 20, 10);
-		JButton btnModeDouble = new JButton("DOUBLE FISH");
-		btnModeDouble.setBorder(BORDER_BUTTON);
-		btnModeDouble.setPreferredSize(BUTTON_SIZE);
-		btnModeDouble.setBackground(COLOR_BUTTON);
-		btnModeDouble.setFocusPainted(false);
-		btnModeDouble.setFont(fontBtn);
-		btnModeDouble.setOpaque(false);
+		JButton btnModeDouble = new ButtonMenu("DOUBLE FISH");
 		btnModeDouble.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -78,33 +64,22 @@ public class OptionPlaying extends Menu{
 		});
 		menuPanel.add(btnModeDouble, cb);
 		
+		//mode2
 		cb.gridx = 1;
 	    cb.gridy = 1;
 	    cb.anchor = GridBagConstraints.CENTER; 
 	    cb.insets = new Insets(20, 10, 20, 0);
-		JButton btnModeSingle = new JButton("SINGLE FISH");
-		btnModeSingle.setBorder(BORDER_BUTTON);
-		btnModeSingle.setPreferredSize(BUTTON_SIZE);
-		btnModeSingle.setBackground(COLOR_BUTTON);
-		btnModeSingle.setFocusPainted(false);
-		btnModeSingle.setFont(fontBtn);
-		btnModeSingle.setOpaque(false);
+		JButton btnModeSingle = new ButtonMenu("SINGLE FISH");
 		menuPanel.add(btnModeSingle, cb);
 		
+		//btn-back
 		GridBagConstraints cb2 = new GridBagConstraints();
         cb2.gridx = 0;
 	    cb2.gridy = 3;
 	    cb2.gridwidth = GridBagConstraints.REMAINDER; // Chiếm hết số cột còn lại
 	    cb2.anchor = GridBagConstraints.CENTER; 
 	    cb2.insets = new Insets(20, 0, 20, 0);
-	    
-		JButton btnBack = new JButton("<< Back");
-		btnBack.setBorder(BORDER_BUTTON);
-		btnBack.setPreferredSize(BUTTON_SIZE);
-		btnBack.setBackground(COLOR_BUTTON);
-		btnBack.setFocusPainted(false);
-		btnBack.setFont(fontBtn);
-		btnBack.setOpaque(false);
+		JButton btnBack = new ButtonMenu("<< Back");
 		btnBack.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -147,10 +122,6 @@ public class OptionPlaying extends Menu{
 	public void setMenuPanel(JPanel menuPanel) {
 		this.menuPanel = menuPanel;
 		
-	}
-	
-	public LevelMenu getLvlMenu() {
-		return lvlMenu;
 	}
 
 }

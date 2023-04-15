@@ -68,9 +68,9 @@ public class Atlas {
 				if(value >= 49)
 				{
 					//crab && octo &&grid
-					if(value == 255) lstPosCrab.add(new Pair(j, i));
-					else if(value == 254) lstPosOcto.add(new Pair(j, i));
-					else if(value == 253) lstPosGrid.add(new Pair(j, i));
+					if(value == 255) lstPosCrab.add(new Pair<Integer, Integer>(j, i));
+					else if(value == 254) lstPosOcto.add(new Pair<Integer, Integer>(j, i));
+					else if(value == 253) lstPosGrid.add(new Pair<Integer, Integer>(j, i));
 					value = 6;
 				}
 				
@@ -83,7 +83,7 @@ public class Atlas {
 				
 				//question
 				if(value == 19) {
-					lstPosQuestion.add(new Pair(j, i));
+					lstPosQuestion.add(new Pair<Integer, Integer>(j, i));
 				}
 				
 				//just save the color red like a spriteID 

@@ -5,15 +5,12 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 
-import entity.Enemy;
 import entity.Fish;
 import main.Game;
-import main.Panel;
 
 public class MoveHandler implements KeyListener {
 
 	private Fish f1, f2;
-	private Panel panel;
 	
 	//special Object collition
 	private boolean touchHint;
@@ -25,8 +22,6 @@ public class MoveHandler implements KeyListener {
 	//touching trap
 	private boolean touchTrap;
 	
-	//enemy
-	private ArrayList<Enemy> enemy;
 	
 	//fish
 	private ArrayList<Pair<Float, Float>> fishPos;
@@ -36,15 +31,13 @@ public class MoveHandler implements KeyListener {
 	public MoveHandler() {
 		hintPos = new Pair<Integer, Integer> (0, 0);
 		lockPos = new Pair<Integer, Integer> (0, 0);
-		enemy = new ArrayList<Enemy>();
 		fishPos = new ArrayList<Pair<Float, Float>>();
 		enemyHandle = false;
 	}
 	
-	public MoveHandler(Fish f1, Fish f2,Panel panel) {
+	public MoveHandler(Fish f1, Fish f2) {
 		this.f1 = f1;
 		this.f2 = f2;
-		this.panel = panel;
 	}
 	
 	public boolean isValidStep(float x, float y, float width, float height, int[][] lvlData, boolean unlock) {
@@ -183,10 +176,6 @@ public class MoveHandler implements KeyListener {
 
 	public void setFishPos(ArrayList<Pair<Float, Float>> fishPos) {
 		this.fishPos = fishPos;
-	}
-
-	public void setEnemy(ArrayList<Enemy> enemy) {
-		this.enemy = enemy;
 	}
 
 	@Override

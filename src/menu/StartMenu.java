@@ -1,6 +1,5 @@
 package menu;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -10,31 +9,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
 
-import main.Game;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+
 import main.Main;
-import main.Panel;
 import root.IOHandler;
 
 public class StartMenu extends Menu {
 	private final Dimension PANEL_SIZE = new Dimension(BUTTON_SIZE.width*2, BUTTON_SIZE.height*4+GAP_BETWEEN_BUTTON.height*5);
-	private final Color COLOR_BUTTON = new Color(41, 171, 226, 117);
-	private final Border BORDER_BUTTON =  BorderFactory.createLineBorder(Color.BLACK, 2);
-	private Font fontBtn;
 	private Font fontTitle;
 	private final String gameName = "FISH ADVANTURE";
-	private BufferedImage fish1;
-	private BufferedImage fish2;
-	private BufferedImage intro;
+	private BufferedImage fish1, fish2, intro;
 	private final int fishSize = Main.TILES_SIZE*6;
 	
 	//private LevelMenu lvlMenu;
@@ -52,21 +38,15 @@ public class StartMenu extends Menu {
 		menuPanel = new JPanel();
 		menuPanel.setLayout(new FlowLayout(FlowLayout.CENTER, GAP_BETWEEN_BUTTON.width, GAP_BETWEEN_BUTTON.height));
 		menuPanel.setFocusable(true);
-		fontBtn = IOHandler.getFont("RussoOne-Regular.ttf").deriveFont(Font.PLAIN, (float)(BUTTON_SIZE.height/3));;
-		fontTitle = IOHandler.getFont("BungeeShade-Regular.ttf").deriveFont(Font.PLAIN, (float)(Main.GAME_HEIGHT/10));
+	
+		fontTitle = FONT_BIG_TITLE.deriveFont(Font.PLAIN, (float)(Main.GAME_HEIGHT/10));
 		
 		//lvlMenu = new LevelMenu(game);
 		optionMenu = new OptionPlaying(this);
 		settingMenu = new SettingMenu(this);
 		instruction = new Instruction(this);
 		
-		JButton btnPlay = new JButton("PLAY");
-        btnPlay.setPreferredSize(BUTTON_SIZE);
-        btnPlay.setBackground(COLOR_BUTTON);
-        btnPlay.setBorder(BORDER_BUTTON);
-        btnPlay.setFocusPainted(false);
-        btnPlay.setFont(fontBtn);
-        btnPlay.setOpaque(false);
+		JButton btnPlay = new ButtonMenu("PLAY");
         btnPlay.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
             	running = false;
@@ -82,13 +62,7 @@ public class StartMenu extends Menu {
         });
        
         
-        JButton btnInstruction = new JButton("INSTRUCTION");
-        btnInstruction.setPreferredSize(BUTTON_SIZE);
-        btnInstruction.setBackground(COLOR_BUTTON);
-        btnInstruction.setBorder(BORDER_BUTTON);
-        btnInstruction.setFocusPainted(false);
-        btnInstruction.setFont(fontBtn);
-        btnInstruction.setOpaque(false);
+        JButton btnInstruction = new ButtonMenu("INSTRUCTION");
         btnInstruction.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
             	running = false;
@@ -104,13 +78,7 @@ public class StartMenu extends Menu {
         });
         
         
-        JButton btnSetting = new JButton("SETTINGS");
-        btnSetting.setPreferredSize(BUTTON_SIZE);
-        btnSetting.setBackground(COLOR_BUTTON);
-        btnSetting.setBorder(BORDER_BUTTON);
-        btnSetting.setFocusPainted(false);
-        btnSetting.setFont(fontBtn);
-        btnSetting.setOpaque(false);
+        JButton btnSetting = new ButtonMenu("SETTINGS");
         btnSetting.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
             	running = false;
@@ -125,13 +93,7 @@ public class StartMenu extends Menu {
             }
         });
         
-        JButton btnExit = new JButton("EXIT");
-        btnExit.setPreferredSize(BUTTON_SIZE);
-        btnExit.setBackground(COLOR_BUTTON);
-        btnExit.setBorder(BORDER_BUTTON);
-        btnExit.setFocusPainted(false);
-        btnExit.setFont(fontBtn);
-        btnExit.setOpaque(false);
+        JButton btnExit = new ButtonMenu("EXIT");
         btnExit.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.exit(0);

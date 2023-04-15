@@ -5,8 +5,6 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
 
 import main.Game;
 import root.IOHandler;
@@ -39,8 +37,6 @@ public class Hint {
 	    int lineHeight = fm.getHeight();
 	    int curX = x;
 	    int curY = y;
-	    StringBuilder sb = new StringBuilder();
-
 	    for (String word : text.split("\\s+")) {
 	        // Tính độ dài của từ hiện tại
 	        int wordWidth = fm.stringWidth(word + " ");

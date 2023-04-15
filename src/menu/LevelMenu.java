@@ -1,9 +1,7 @@
 package menu;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -11,14 +9,11 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.util.HashMap;
-import java.util.Map;
 
-import javax.swing.BorderFactory;
+
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.border.Border;
 
 import main.Game;
 import main.Main;
@@ -26,26 +21,24 @@ import root.IOHandler;
 
 public class LevelMenu extends Menu{
 	
-	private int numberOfMap = 6;
 	private final String title = "CHOOSE LEVEL";
-	private Font fontBtn;
 	private Font fontTitle;
 	private JButton[] btnLvl;
 	private BufferedImage bgLvlMenu;
 	private final Dimension PANEL_SIZE = new Dimension(BUTTON_SIZE.width*5, BUTTON_SIZE.height*5+GAP_BETWEEN_BUTTON.height*5);
-
+	private Game game;
 	
 	public LevelMenu(Game game) {
+		this.game = game;
 		running = true;
 		bgLvlMenu = IOHandler.getImage("seaCave.gif");
 
 		menuPanel = new JPanel(new GridBagLayout());
 	    		
 		menuPanel.setFocusable(true);
-		fontBtn = IOHandler.getFont("RussoOne-Regular.ttf").deriveFont(Font.PLAIN, (float)(BUTTON_SIZE.height/3));;
-		fontTitle = IOHandler.getFont("RussoOne-Regular.ttf").deriveFont(Font.PLAIN, (float)(BUTTON_SIZE.height/2));
+		fontTitle = FONT_TITLE.deriveFont(Font.PLAIN, (float)(BUTTON_SIZE.height/2));
 		
-		JLabel titleLabel = new JLabel("CHOOSE LEVEL");
+		JLabel titleLabel = new JLabel(title);
 	    titleLabel.setFont(fontTitle);
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = new Insets(20, 0, 20, 0);
@@ -57,23 +50,19 @@ public class LevelMenu extends Menu{
 		
         GridBagConstraints cb1 = new GridBagConstraints();
         cb1.insets = new Insets(10, 10, 10, 10);
-		btnLvl = new JButton[game.getTotalLevel()+1];
+		btnLvl = new JButton[game.getTotalLevel()];
 		for (int i = 0; i < game.getTotalLevel(); i++) {
 			final int level = i+1;
-			btnLvl[i] = new JButton("Level "+level);
-			btnLvl[i].setBorder(BORDER_BUTTON);
-	        btnLvl[i].setPreferredSize(BUTTON_SIZE);
-	        btnLvl[i].setBackground(COLOR_BUTTON);
-	        
-	        btnLvl[i].setFocusPainted(false);
-	        btnLvl[i].setFont(fontBtn);
-	        btnLvl[i].setOpaque(false);
+			String btnName = "Level "+level;
+			if(level > game.getLastLevel()) {
+				btnName = "[X] "+btnName;
+			}
+			btnLvl[i] = new ButtonMenu(btnName);
 	        cb1.gridx = i % 3;
             cb1.gridy = i / 3+1;
-	        menuPanel.add(btnLvl[i], cb1);
-	        
 			btnLvl[i].addActionListener(new ActionListener() {
 	            public void actionPerformed(ActionEvent e) {
+	            	if(level > game.getLastLevel()) return;
 	            	menuPanel.setVisible(false);
 	            	running = false;
 	            	game.getPanel().repaint();
@@ -82,8 +71,11 @@ public class LevelMenu extends Menu{
 	            	
 	            }
 	        });
+			
+			menuPanel.add(btnLvl[i], cb1);
 		}
 		
+		//btn-back
 		GridBagConstraints cb2 = new GridBagConstraints();
         cb2.gridx = 0;
 	    cb2.gridy = 6;
@@ -91,13 +83,7 @@ public class LevelMenu extends Menu{
 	    cb2.anchor = GridBagConstraints.CENTER; 
 	    cb2.insets = new Insets(20, 0, 20, 0);
 	    
-		JButton btnBack = new JButton("<< Back");
-		btnBack.setBorder(BORDER_BUTTON);
-		btnBack.setPreferredSize(BUTTON_SIZE);
-		btnBack.setBackground(COLOR_BUTTON);
-		btnBack.setFocusPainted(false);
-		btnBack.setFont(fontBtn);
-		btnBack.setOpaque(false);
+		JButton btnBack = new ButtonMenu("<< Back");
 		btnBack.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -131,7 +117,6 @@ public class LevelMenu extends Menu{
 	public void setRunning(boolean running) {
 		menuPanel.setVisible(running);
 		this.running = running;
-		
 	}
 	@Override
 	public JPanel getMenuPanel() {
@@ -143,6 +128,16 @@ public class LevelMenu extends Menu{
 		
 	}
 	
+	public void update() {
+		for (int i = 0; i < btnLvl.length; i++) {
+			int level = i+1;
+			String btnName = "Level "+level;
+			if(level > game.getLastLevel()) {
+				btnName = "[X] "+btnName;
+			}
+			btnLvl[i].setText(btnName);
+		}
+	}
 
 	public JButton[] getBtnLvl() {
 		return btnLvl;

@@ -1,9 +1,7 @@
 package menu;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -11,30 +9,20 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.util.HashMap;
-import java.util.Map;
 
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.border.Border;
 
-import main.Game;
 import main.Main;
 import root.IOHandler;
 
 public class Instruction extends Menu{
-	
-	private int numberOfMap = 6;
-	private final String title = "CHOOSE LEVEL";
-	private Font fontBtn;
+	private final String title = "INSTRUCTION";
 	private Font fontTitle;
-	private JButton[] btnLvl;
 	private BufferedImage bgLvlMenu;
 	private final Dimension PANEL_SIZE = new Dimension(BUTTON_SIZE.width*5, BUTTON_SIZE.height*5+GAP_BETWEEN_BUTTON.height*5);
 	
-	private Game game;
 	private LevelMenu lvlMenu;
 	
 	public Instruction(StartMenu startMenu) {
@@ -43,10 +31,9 @@ public class Instruction extends Menu{
 		menuPanel = new JPanel(new GridBagLayout());
 		
 		menuPanel.setFocusable(true);
-		fontBtn = IOHandler.getFont("RussoOne-Regular.ttf").deriveFont(Font.PLAIN, (float)(BUTTON_SIZE.height/3));;
-		fontTitle = IOHandler.getFont("RussoOne-Regular.ttf").deriveFont(Font.PLAIN, (float)(BUTTON_SIZE.height/2));
+		fontTitle = FONT_TITLE.deriveFont(Font.PLAIN, (float)(BUTTON_SIZE.height/2));
 		
-		JLabel titleLabel = new JLabel("INSTRUCTION");
+		JLabel titleLabel = new JLabel(title);
 	    titleLabel.setFont(fontTitle);
 		GridBagConstraints c = new GridBagConstraints();
 		c.insets = new Insets(20, 0, 20, 0);
@@ -64,13 +51,7 @@ public class Instruction extends Menu{
 	    cb2.anchor = GridBagConstraints.CENTER; 
 	    cb2.insets = new Insets(20, 0, 20, 0);
 	    
-		JButton btnBack = new JButton("<< Back");
-		btnBack.setBorder(BORDER_BUTTON);
-		btnBack.setPreferredSize(BUTTON_SIZE);
-		btnBack.setBackground(COLOR_BUTTON);
-		btnBack.setFocusPainted(false);
-		btnBack.setFont(fontBtn);
-		btnBack.setOpaque(false);
+		JButton btnBack = new ButtonMenu("<< Back");
 		btnBack.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {

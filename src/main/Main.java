@@ -1,7 +1,5 @@
 package main;
 
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 import menu.AudioPlayer;
 import menu.Menu;
@@ -11,7 +9,8 @@ import root.IOHandler;
 public class Main {
 	public static Screen SCREEN;
 	public static Panel STARTPANEL;
-	
+	public static final String CONFIG_FILE = "config.properties";
+	public static final String UPDATE_FILE = "update.properties";
 	// config game
 	public static int TILES_DEFAULT_SIZE;
 	public static float SCALE;
@@ -25,9 +24,9 @@ public class Main {
 	public static AudioPlayer AUDIOPLAYER;
 	
 	private static void importScreenConfig() {
-		TILES_DEFAULT_SIZE = Integer.parseInt(IOHandler.getProperty("TILES_DEFAULT_SIZE").trim());
-		SCALE = Float.parseFloat(IOHandler.getProperty("SCALE").trim());
-		TILES_IN_WIDTH = Integer.parseInt(IOHandler.getProperty("TILES_IN_WIDTH").trim());
+		TILES_DEFAULT_SIZE = Integer.parseInt(IOHandler.getProperty("TILES_DEFAULT_SIZE",CONFIG_FILE).trim());
+		SCALE = Float.parseFloat(IOHandler.getProperty("SCALE", CONFIG_FILE).trim());
+		TILES_IN_WIDTH = Integer.parseInt(IOHandler.getProperty("TILES_IN_WIDTH",CONFIG_FILE).trim());
 		TILES_SIZE = (int) (TILES_DEFAULT_SIZE * SCALE);
 		GAME_WIDTH = TILES_SIZE * TILES_IN_WIDTH;
 		GAME_HEIGHT = TILES_SIZE * TILES_IN_HEIGHT;
@@ -36,6 +35,7 @@ public class Main {
 	public static void main(String[] args) {
 		importScreenConfig();
 		AUDIOPLAYER = new AudioPlayer("audio1.wav");
+		AUDIOPLAYER.stop();
 		STARTPANEL= new Panel(null, GAME_WIDTH, GAME_HEIGHT);// create panel
 		SCREEN = new Screen(STARTPANEL);// Create window
 		Menu startMenu = new StartMenu();
@@ -44,6 +44,7 @@ public class Main {
 		
 		STARTPANEL.revalidate(); 
 		STARTPANEL.repaint();
+		
 		
 	}
 

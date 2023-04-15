@@ -1,6 +1,5 @@
 package entity;
 
-import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.BorderLayout;
@@ -47,7 +46,7 @@ public class Lock {
 		this.width = width;
 		this.height = height;
 		this.password = password.toLowerCase().replaceAll("\\s+", "");
-		this.password2 = password.toLowerCase().replaceAll("\\s+", "");
+		this.password2 = password2.toLowerCase().replaceAll("\\s+", "");
 		this.limitTyping = limitTyping;
 		
 		currTyping = 0;
