@@ -65,8 +65,9 @@ public class StartMenu extends Menu {
         JButton btnInstruction = new ButtonMenu("INSTRUCTION");
         btnInstruction.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-            	running = false;
-            	menuPanel.setVisible(false);
+//            	running = false;
+//            	menuPanel.setVisible(false);
+            	setRunning(false);
             	instruction.setRunning(true);
             	if(!Main.STARTPANEL.isAncestorOf(instruction.getMenuPanel())) {
             		Main.STARTPANEL.add(instruction.getMenuPanel());

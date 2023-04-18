@@ -26,6 +26,7 @@ public class AppDbContext {
 		DB_NAME = IOHandler.getProperty("DB_NAME",Main.CONFIG_FILE).trim();
 		USER = IOHandler.getProperty("USER",Main.CONFIG_FILE).trim();
 		PASS = IOHandler.getProperty("PASS",Main.CONFIG_FILE).trim();
+		DB_URL = "jdbc:mysql://"+HOST_NAME+"/"+DB_NAME+"?serverTimezone=UTC";
 		
 		lvlEntity = new ArrayList<LevelEntity>();
 		hintEntity = new ArrayList<HintEntity>();

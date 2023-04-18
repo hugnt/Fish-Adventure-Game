@@ -18,6 +18,7 @@ import javax.swing.JPanel;
 
 import main.Game;
 import main.Main;
+import main.SurvivalGame;
 import root.IOHandler;
 
 public class OptionPlaying extends Menu{
@@ -28,6 +29,7 @@ public class OptionPlaying extends Menu{
 	private final Dimension PANEL_SIZE = new Dimension(BUTTON_SIZE.width*5, BUTTON_SIZE.height*5+GAP_BETWEEN_BUTTON.height*5);
 	
 	private Game game;
+	private SurvivalGame game2;
 	
 	public OptionPlaying(StartMenu startMenu) {
 		running = true;
@@ -69,7 +71,14 @@ public class OptionPlaying extends Menu{
 	    cb.gridy = 1;
 	    cb.anchor = GridBagConstraints.CENTER; 
 	    cb.insets = new Insets(20, 10, 20, 0);
-		JButton btnModeSingle = new ButtonMenu("SINGLE FISH");
+		JButton btnModeSingle = new ButtonMenu("SURVIVAL FISH");
+		btnModeSingle.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+            	game2 = new SurvivalGame();
+			}
+		});
+		
 		menuPanel.add(btnModeSingle, cb);
 		
 		//btn-back

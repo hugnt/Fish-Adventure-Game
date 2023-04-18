@@ -38,10 +38,15 @@ public class Main {
 		AUDIOPLAYER.stop();
 		STARTPANEL= new Panel(null, GAME_WIDTH, GAME_HEIGHT);// create panel
 		SCREEN = new Screen(STARTPANEL);// Create window
+		
+		
 		Menu startMenu = new StartMenu();
+		
 		STARTPANEL.setMenu(startMenu);
 		STARTPANEL.add(startMenu.getMenuPanel());
 		
+		
+		//reset panel
 		STARTPANEL.revalidate(); 
 		STARTPANEL.repaint();
 		
