@@ -11,7 +11,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 
-import main.Game;
 import main.Main;
 
 import javax.swing.BorderFactory;

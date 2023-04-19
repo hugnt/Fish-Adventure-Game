@@ -6,8 +6,6 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-
-import main.Game;
 import main.Main;
 import root.IOHandler;
 import root.MoveHandler;

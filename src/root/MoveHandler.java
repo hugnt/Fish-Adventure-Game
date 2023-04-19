@@ -6,7 +6,6 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 
 import entity.Fish;
-import main.Game;
 import main.Main;
 
 public class MoveHandler implements KeyListener {

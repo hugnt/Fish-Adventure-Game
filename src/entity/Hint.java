@@ -6,7 +6,6 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 
-import main.Game;
 import main.Main;
 import root.IOHandler;
 

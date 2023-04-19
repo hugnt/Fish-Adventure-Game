@@ -1,55 +1,43 @@
-//package entity;
-//
-//import java.awt.Graphics2D;
-//import java.awt.Rectangle;
-//import java.awt.image.BufferedImage;
-//import java.io.IOException;
-//import javax.imageio.ImageIO;
-//import main.SurvivalGame;
-//import root.IOHandler;
-//
-//public class Blade extends Entity {
-//	public final boolean isEnemy = true;
-//	public int length;
-//	public int startX, startY;
-//	public int speed = 3;
-//	int[] dir;
-//	private BufferedImage image;
-//	public Blade(SurvivalGame SG, int startX, int startY, int length, int [] dir) {
-//		species = "Blade";
-//		this.SG = SG;
-//		this.startX = startX;
-//		this.startY = startY;
-//		this.worldX = startX;
-//		this.worldY = startY;
-//		this.length = length;
-//		this.dir = dir;
-//		hitBox = new Rectangle(3, 3, 30, 30);
-//		image = IOHandler.getImage("blade");
-//	}
-//	public void update() {
-//		if(dis() > length){
-//			this.startX = (int)x;
-//			this.startY = (int)y;
-//			dir1 = -dir1;
-//			dir2 = -dir2;
-//		}
-//		
-//		x += speed*dir1;
-//		y += speed*dir2;
-//	}
-//	private double dis() {
-//		return Math.sqrt(Math.pow(x - startX, 2) + Math.pow(y - startY, 2));
-//	}
-//	public void draw(Graphics2D g2) {
-//			int screenX = (int)x - SG.playerWorldX() + SG.playerScreenX();
-//			int screenY = (int)y - SG.playerWorldY() + SG.playerScreenY();
-//			//iff screenX
-//			if(screenX >= -5*SG.tileSize() && screenY >= -5*SG.tileSize() 
-//					&& screenX <= SG.screenWidth() + 5*SG.tileSize() && screenX <= SG.screenHeight() + 5*SG.tileSize()) {
-//				g2.drawImage(image, screenX, screenY, (int)(SG.tileSize() *1.5) , (int)(SG.tileSize() *1.5), null);
-//			}
-//				 //orriginal size
-//			
-//	}
-//}
+package entity;
+
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+import main.*;
+import root.*;
+
+public class Blade extends Creature {
+	BufferedImage img;
+	private double startX, startY, speedCoef, length, dirx, diry;
+	public Blade(SurvivalGame SG, double startX, double startY, double speedCoef, double length, double dirx, double diry) {
+		super(SG, startX, startY, "Blade", 
+				new Rectangle((int)(3*Main.SCALE), (int)(3*Main.SCALE), (int)(30*Main.SCALE), (int)(30*Main.SCALE)));
+		this.startX = startX;
+		this.startY = startY;
+		this.speedCoef = speedCoef;
+		this.length = length;
+		this.dirx = dirx;
+		this.diry = diry;
+		img = IOHandler.getImage("blade.png");
+	}
+	public void update() {
+		if(Math.sqrt(Math.pow(worldX - startX, 2) + Math.pow(worldY - startY, 2))> length)
+		{
+			this.startX = worldX;
+			this.startY = worldY;
+			dirx = -dirx;
+			diry = -diry;
+		}
+		worldX += speedCoef*dirx;
+		worldY += speedCoef*diry;
+	}
+	public void render(Graphics2D g2) {
+		int screenX = (int)worldX - SG.getPlayer().getWorldX() + SG.getPlayer().getScreenX();
+		int screenY = (int)worldY - SG.getPlayer().getWorldY() + SG.getPlayer().getScreenY();
+		if(screenX >= -5*Main.TILES_SIZE && screenY >= -5*Main.TILES_SIZE 
+			&& screenX <= Main.GAME_WIDTH + 5*Main.TILES_SIZE 
+			&& screenY <= Main.GAME_HEIGHT + 5*Main.TILES_SIZE) {
+			g2.drawImage(img, screenX, screenY, (int)(Main.TILES_SIZE *1.5) , (int)(Main.TILES_SIZE *1.5), null);
+		}			
+	}
+}

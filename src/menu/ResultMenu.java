@@ -14,13 +14,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import main.Game;
+import main.DoubleGame;
 import main.Main;
 import main.SurvivalGame;
 import root.IOHandler;
 
 public class ResultMenu extends Menu{
-	private Dimension PANEL_SIZE = new Dimension(BUTTON_SIZE.width*2, BUTTON_SIZE.height*4+GAP_BETWEEN_BUTTON.height*6);
+	private Dimension PANEL_SIZE = new Dimension((int)(BUTTON_SIZE.width*2.5), BUTTON_SIZE.height*4+GAP_BETWEEN_BUTTON.height*6);
 	private Font fontTitle, fontPoint, fontMessange;
 	private String title = "RESULT";
 	private JDialog resDialog;
@@ -60,7 +60,7 @@ public class ResultMenu extends Menu{
 		lblDeath.setBorder(null);
 		lblDeath.setFont(fontMessange);
 		lblDeath.setOpaque(false);
-		lblDeath.setText("Death reason: NGU");
+		lblDeath.setText(game.getPlayer().getDeathMessage());
 		
 	    JButton btnRestart = new ButtonMenu("NEW GAME");
         btnRestart.addActionListener(new ActionListener() {
@@ -99,7 +99,7 @@ public class ResultMenu extends Menu{
         
 	}
 	
-	public ResultMenu(Game game) {
+	public ResultMenu(DoubleGame game) {
 		resDialog = new JDialog();
 		resDialog.setModal(true);
 		
@@ -116,6 +116,16 @@ public class ResultMenu extends Menu{
 		lbResult.setBorder(null);
 		lbResult.setFont(fontTitle);
 		lbResult.setOpaque(false);
+		
+		fontMessange = IOHandler.getFont("RobotoMono-Regular.ttf").deriveFont(Font.PLAIN, (float)(BUTTON_SIZE.height/4));;
+		JLabel lblDeath = new JLabel();
+		lblDeath.setPreferredSize(new Dimension(BUTTON_SIZE.width*2, (int)(BUTTON_SIZE.height*0.5)));
+		lblDeath.setHorizontalAlignment(SwingConstants.CENTER);
+		lblDeath.setBorder(null);
+		lblDeath.setFont(fontMessange);
+		lblDeath.setOpaque(false);
+		lblDeath.setText("YOU HAVE TOUCHED IN A TRAP OR ENEMY");
+		
 		
 		JButton btnNextLevel = new ButtonMenu("NEXT LEVEL");
 		btnNextLevel.addActionListener(new ActionListener() {
@@ -174,6 +184,7 @@ public class ResultMenu extends Menu{
     	}
         
         resDialog.add(lbResult);
+        if(game.isLose()==true) resDialog.add(lblDeath);
         if(game.isWin()==true) resDialog.add(btnNextLevel);
         resDialog.add(btnRestart);
         resDialog.add(btnExitToMap);

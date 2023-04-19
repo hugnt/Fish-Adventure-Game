@@ -50,7 +50,7 @@ public class Main {
 	public static void main(String[] args) {
 		importGameConfig();
 		AUDIOPLAYER = new AudioPlayer("audio1.wav");
-		AUDIOPLAYER.stop();
+		//AUDIOPLAYER.stop();
 		STARTPANEL = new Panel(null, GAME_WIDTH, GAME_HEIGHT);// create panel
 		SCREEN = new Screen(STARTPANEL);// Create window
 

@@ -17,14 +17,14 @@ import javax.swing.JPanel;
 
 import javax.swing.SwingConstants;
 
-import main.Game;
+import main.DoubleGame;
 import main.Main;
 import main.SurvivalGame;
 import root.IOHandler;
 import root.SKeyHandler;
 
 public class PauseMenu extends Menu{
-	private final Dimension PANEL_SIZE = new Dimension(BUTTON_SIZE.width*2, BUTTON_SIZE.height*5+GAP_BETWEEN_BUTTON.height*6);
+	private final Dimension PANEL_SIZE = new Dimension(BUTTON_SIZE.width*2,(int)(BUTTON_SIZE.height*5+GAP_BETWEEN_BUTTON.height*6.5));
 	private Font fontTitle;
 	private final String title = "PAUSED";
 	private JDialog pauseDialog;
@@ -52,24 +52,22 @@ public class PauseMenu extends Menu{
         btnResume.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	running = false;
-            	pauseDialog.setVisible(false);
-            	SKeyHandler.paused = false;
+            	setRunning(false);
+            	game.setPauseGame(false);
             	SKeyHandler.RESET();
             	game.requestFocus();
             }
         });
-        pauseDialog.addKeyListener(new KeyAdapter() {
-        	@Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_P) {
-                	running = false;
-                	pauseDialog.setVisible(false);
-                    SKeyHandler.RESET();
-                }
-            }
+        JButton btnExitToMenu = new ButtonMenu("EXIT TO MENU");
+        btnExitToMenu.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				pauseDialog.setVisible(false);
+				game.end();
+				game.setVisible(false);
+				Main.STARTPANEL.setVisible(true);
+			}
 		});
-
        
         
         JButton btnRestart = new ButtonMenu("NEW GAME");
@@ -88,7 +86,7 @@ public class PauseMenu extends Menu{
         pauseDialog.add(Main.AUDIOPLAYER);
         pauseDialog.add(btnResume);
         pauseDialog.add(btnRestart);
-	
+        pauseDialog.add(btnExitToMenu);
         pauseDialog.setTitle("Pause Screen");
         pauseDialog.setSize(PANEL_SIZE);
         pauseDialog.setLocationRelativeTo(null);
@@ -99,7 +97,7 @@ public class PauseMenu extends Menu{
         
 	}
 	
-	public PauseMenu(Game game) {
+	public PauseMenu(DoubleGame game) {
 		pauseDialog = new JDialog();
 		pauseDialog.setModal(true);
 		

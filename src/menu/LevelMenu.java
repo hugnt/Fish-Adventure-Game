@@ -15,7 +15,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import main.Game;
+import main.DoubleGame;
 import main.Main;
 import root.IOHandler;
 
@@ -26,9 +26,9 @@ public class LevelMenu extends Menu{
 	private JButton[] btnLvl;
 	private BufferedImage bgLvlMenu;
 	private final Dimension PANEL_SIZE = new Dimension(BUTTON_SIZE.width*5, BUTTON_SIZE.height*5+GAP_BETWEEN_BUTTON.height*5);
-	private Game game;
+	private DoubleGame game;
 	
-	public LevelMenu(Game game) {
+	public LevelMenu(DoubleGame game) {
 		this.game = game;
 		running = true;
 		bgLvlMenu = IOHandler.getImage("seaCave.gif");

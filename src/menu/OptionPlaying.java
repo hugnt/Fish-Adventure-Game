@@ -16,7 +16,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 
-import main.Game;
+import main.DoubleGame;
 import main.Main;
 import main.SurvivalGame;
 import root.IOHandler;
@@ -28,7 +28,7 @@ public class OptionPlaying extends Menu{
 	private BufferedImage bgLvlMenu;
 	private final Dimension PANEL_SIZE = new Dimension(BUTTON_SIZE.width*5, BUTTON_SIZE.height*5+GAP_BETWEEN_BUTTON.height*5);
 	
-	private Game game;
+	private DoubleGame game;
 	private SurvivalGame game2;
 	
 	public OptionPlaying(StartMenu startMenu) {
@@ -61,7 +61,7 @@ public class OptionPlaying extends Menu{
 		btnModeDouble.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-            	game = new Game();
+            	game = new DoubleGame();
 			}
 		});
 		menuPanel.add(btnModeDouble, cb);

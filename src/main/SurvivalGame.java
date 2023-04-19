@@ -1,48 +1,40 @@
 package main;
+
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import javax.swing.JPanel;
 import root.*;
 import entity.*;
-import map.*;
+import map.SurvivalMap;
 import menu.PauseMenu;
 import menu.ResultMenu;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.rmi.server.Skeleton;
-
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JPanel;
 
 public class SurvivalGame extends JPanel implements Runnable{ //Panel + Thread
-	public static final int WORLD_COL = 50;
-	public static final int WORLD_ROW = 50;
-	public static final int WORLD_WIDTH =  Main.TILES_SIZE * WORLD_COL;
-	public static final int WORLD_HEIGHT = Main.TILES_SIZE * WORLD_ROW;
-	private int FPS_SET = 60;
-	
-	private boolean gameOver;
-	private boolean GamePaused;
-	
+	public static final int WORLD_COL = (int)(50*Main.SCALE);
+	public static final int WORLD_ROW = (int)(50*Main.SCALE);
+	public static final int WORLD_WIDTH = (int)(Main.TILES_SIZE * WORLD_COL);
+	public static final int WORLD_HEIGHT = (int)(Main.TILES_SIZE * WORLD_ROW);
+	public static final int FPS_SET = (int)(Main.FPS_SET*0.5);
+	private static final double OBS_PERCENTAGE = 0.15;
+	private static final double ORB_PERCENTAGE = 0.05;
+	private static final double BLADE = 0.0036;//0.0036;
+	private static final double BLUE_GUARD = 0.0036;//;0.0036;
+	private static final double CHASER = 0.0027;//0.0027;
 	private SurvivalFish player;
 	private Goldfish goldfish;
-	private Creature[] creature;
-	private SurvivalMap smap;
+	private Spawner spawner;
+	private SurvivalMap survivalMap;
 	private Thread gameThread;
-	
-	//game status
 	private boolean lose;
-	
-	
+	private BufferedImage backgroundImg;
+	private boolean gamePaused;
 	public SurvivalGame(){
 		Main.STARTPANEL.setVisible(false);
 		Main.SCREEN.getScreen().add(this);
@@ -52,48 +44,48 @@ public class SurvivalGame extends JPanel implements Runnable{ //Panel + Thread
         	@Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_P) {
+                	gamePaused = true;
                 	pauseMenu.setRunning(!pauseMenu.getRunning());
                 }
             }
 		});
-		//player.giveInvincibility((long)10e9);
 		this.requestFocusInWindow();
 		this.requestFocus();
 		this.setPreferredSize(new Dimension(Main.GAME_WIDTH, Main.GAME_HEIGHT));
 		this.setBackground(Color.black);
 		this.addKeyListener(new SKeyHandler());
-		this.setFocusable(true); //game panel can be focused to receive key input
+		this.setFocusable(true);
 	
 	}
-
-	//Private methods
 	public void start() {
 		lose = false;
-		//pause menu
-	
-        //other 
         SKeyHandler.RESET();
+        backgroundImg = IOHandler.getImage("water.png");
 		player = new SurvivalFish(this, WORLD_WIDTH/2, WORLD_HEIGHT/2);
+		player.giveInvincibility((long)10e9);
 		goldfish = new Goldfish(this, WORLD_WIDTH/2, WORLD_HEIGHT/2, 0.03);
-		smap = new SurvivalMap(this, 0.15, 0.05, 0.1, 0.05, 0.01);
+		survivalMap = new SurvivalMap(this, OBS_PERCENTAGE, ORB_PERCENTAGE, 0.1, 0.05, 0.01);
+		spawner = new Spawner(this, BLADE, BLUE_GUARD, CHASER);
 		gameThread = new Thread(this);
 		gameThread.start();
 	}
-	
 	public void run() { 
 		double drawInterval = 1000000000/FPS_SET;
 		double delta = 0;
 		long lastTime = System.nanoTime();
 		long currentTime;
 		while(true&&!gameThread.isInterrupted()) {
+			currentTime = System.nanoTime();
+			if(gamePaused) {
+				lastTime = currentTime;
+				continue;
+			}
 			if(lose) {
-				lose= false;
+				lose = false;
 			    ResultMenu resMenu = new ResultMenu(this);
 				resMenu.setRunning(true);	
-		
 				break;
 			};
-			currentTime = System.nanoTime();
 			delta += (currentTime - lastTime)/drawInterval;
 			if(delta >= 1) {
 				update();
@@ -106,84 +98,50 @@ public class SurvivalGame extends JPanel implements Runnable{ //Panel + Thread
 	public void update() {
 		player.update();
 		goldfish.update();
-		
-
+		spawner.update();
 	}
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D g2 = (Graphics2D)g;
 	    player.render(g2);
 	    goldfish.render(g2);
-	    smap.render(g2);
-
-	    /*Replace with JDialog*/
-
-	 
-		
+	    survivalMap.render(g2);
+	    spawner.render(g2);
+		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.25f));	
+		g2.drawImage(backgroundImg, 0, 0, (int)(Math.max(Main.GAME_WIDTH, Main.GAME_HEIGHT)*Main.SCALE)*2, (int)(Math.max(Main.GAME_WIDTH, Main.GAME_HEIGHT)*Main.SCALE)*2, null);
+		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 	    g2.setColor(Color.WHITE);
-	    g2.drawString("Point: " + player.getPoint(), (int)(20*Main.SCALE), (int)(20*Main.SCALE));
-
-	}
-
-	//Get methods
-	public boolean isOver() {
-		return gameOver;
-	}
-	public boolean isPaused() {
-		return GamePaused;
+	    g2.drawString("Point: " + player.getPoint(), Main.TILES_SIZE, Main.TILES_SIZE);
 	}
 	
+	/*Get set method*/
 	public SurvivalFish getPlayer() {
 		return player;
 	}
-
-	
-
-	//Player's methods
-	public int playerWorldX() {
-		return player.getWorldX();
+	public Goldfish getGoldfish() {
+		return goldfish;
 	}
-	public int playerWorldY() {
-		return player.getWorldY();
+	public SurvivalMap getMap() { 
+		return survivalMap;
 	}
-	public int playerScreenX() {
-		return player.getScreenX();
+	public Spawner getSpawner() {
+		return spawner;
 	}
-	public int playerScreenY() {
-		return player.getScreenY();
-	}
-	public void setDeathMessage(String str) {
-		player.setDeathMessage(str);
-	}
-	//Map's method
-	public boolean tileIsMoveable(int code) {
-		return smap.tileIsMoveable(code);
-	}
-	public boolean tileIsConsumable(int code) {
-		return smap.tileIsConsumable(code);
-	}
-	public boolean tileIsTrap(int code) {
-		return smap.tileIsTrap(code);
-	}
-	public int[] traceMap(int[][] hitbox, int deltax, int deltay, boolean isConsumable) {
-		return smap.traceMap(hitbox, deltax, deltay, isConsumable);
-	}
-	//Set methods
 	public void end() {
 		gameThread.interrupt();
 		setIgnoreRepaint(true);
 		removeAll();
-		
 	}
-	
-	
-
-	public void setLose(boolean lose) {
-		this.lose = lose;
-	}
-
 	public boolean isLose() {
 		return lose;
 	}
-
+	public void setLose(boolean lose) {
+		this.lose = lose;
+	}
+	public void setPauseGame(boolean pause) {
+		gamePaused = pause;
+	}
+	public boolean getPauseGame() {
+		return gamePaused;
+	}
 }

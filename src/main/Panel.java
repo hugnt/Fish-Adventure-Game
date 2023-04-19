@@ -10,13 +10,13 @@ import menu.Menu;
 import root.IOHandler;
 
 public class Panel extends JPanel{
-	private Game game;
+	private DoubleGame game;
 	private int width,height;
 	private BufferedImage background;
 	private final String BG_URL = "bg05.jpg";
 	private Menu menu;
 	
-	public Panel(Game game, int width, int height) {
+	public Panel(DoubleGame game, int width, int height) {
 		super();
 		this.game = game;
 		this.height = height;
@@ -40,7 +40,7 @@ public class Panel extends JPanel{
 			menu.render(g);
 		}
 		else {
-			System.out.println("NGUUU");
+			System.out.println("EMPTY PANEL");
 		}
 	}
 	public Menu getMenu() {

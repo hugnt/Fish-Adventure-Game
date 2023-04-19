@@ -5,7 +5,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
-import main.Game;
+import main.DoubleGame;
 import main.Main;
 import root.IOHandler;
 import root.Pair;

@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.SQLException;
 import java.util.*;
 
 import javax.swing.BorderFactory;
@@ -25,12 +24,11 @@ import menu.PauseMenu;
 import menu.ResultMenu;
 import models.HintEntity;
 import models.LevelEntity;
-import root.AppDbContext;
 import root.IOHandler;
 import root.MoveHandler;
 import root.Pair;
 
-public class Game implements Runnable {
+public class DoubleGame implements Runnable {
 
 //	private Screen screen;
 	private Panel panel;
@@ -70,7 +68,7 @@ public class Game implements Runnable {
 	private ArrayList<LevelEntity> lvlEntity;
 	private ArrayList<HintEntity> hintEntity;
 
-	public Game() {
+	public DoubleGame() {
 		importGameProps();
 		lvlMenu = new LevelMenu(this);
    
@@ -159,8 +157,6 @@ public class Game implements Runnable {
 	private void initCharacter() {
 		fish1 = new Fish(Main.TILES_SIZE * 2, Main.TILES_SIZE * 6, 64 * Main.SCALE, 64 * Main.SCALE, "red");
 		fish2 = new Fish(Main.TILES_SIZE * 2, Main.TILES_SIZE * 16, 64 * Main.SCALE, 64 * Main.SCALE, "blue");
-		fish1.setOtherFish(fish2);
-		fish2.setOtherFish(fish1);
 		fish1.setMapData(map.getMapData());
 		fish2.setMapData(map.getMapData());
 	}
@@ -225,7 +221,7 @@ public class Game implements Runnable {
         btnPause.setBorder(BorderFactory.createLineBorder(new Color(18,219,242,255), 2));
         btnPause.setMargin(new Insets(0,0, 0, 0));
 		
-        PauseMenu pauseMenu = new PauseMenu(Game.this);
+        PauseMenu pauseMenu = new PauseMenu(DoubleGame.this);
         btnPause.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {

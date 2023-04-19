@@ -5,10 +5,9 @@ import java.util.Random;
 import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-
+import java.awt.Rectangle;
 import main.Main;
 import main.SurvivalGame;
 import root.IOHandler;
@@ -18,7 +17,10 @@ class Tile {
 	public boolean isConsumable = false;
 	public boolean isObstacle = false;
 	public boolean isTrap = false;
-	//public Rectangle solidArea;
+	public Rectangle solidArea;
+	public Tile() {
+		solidArea = new Rectangle(0, 0, Main.TILES_SIZE, Main.TILES_SIZE);
+	}
 }
 
 /*(Current) CODE 
@@ -43,8 +45,8 @@ public class SurvivalMap {
 	private final int PADD = 1;
 	public SurvivalMap(SurvivalGame SG, double obsPerc, double orbPerc, double decoPerc, double trapPerc, double altObsPerc) {
 		this.SG = SG;
-		imgCode = new Tile[100];
-		tile = new int[SG.WORLD_ROW][SG.WORLD_COL];
+		imgCode = new Tile[30];
+		tile = new int[SurvivalGame.WORLD_ROW][SurvivalGame.WORLD_COL];
 		loadSprite();
 		createRandomness(obsPerc, orbPerc, decoPerc, trapPerc, altObsPerc); //Generate random map & datastructure for random placement of orbs
 		loadRandomMap();
@@ -73,6 +75,7 @@ public class SurvivalMap {
 		imgCode[19].image = IOHandler.getImage("orb.png");
 		imgCode[19].isConsumable = true;
 		imgCode[19].isObstacle = false;
+		imgCode[19].solidArea = new Rectangle(Main.TILES_SIZE/4, Main.TILES_SIZE/4, Main.TILES_SIZE/2, Main.TILES_SIZE/2);
 		
 		imgCode[20] = new Tile();
 		imgCode[20].image = img.getSubimage(4*512, 6*512, 512, 512);
@@ -82,17 +85,12 @@ public class SurvivalMap {
 		
 		imgCode[22] = new Tile();
 		imgCode[22].image = img.getSubimage(6*512, 6*512, 512, 512);
-		
-		imgCode[99] = new Tile();
-		imgCode[99].image = IOHandler.getImage("water.png");
-		imgCode[99].isConsumable = false;
-		imgCode[99].isObstacle = false;
 	}
 	private void createRandomness(double obsPerc, double orbPerc, double decoPerc, double trapPerc, double altObsPerc){
-		int height = SG.WORLD_ROW;
-		int width = SG.WORLD_COL;
-		int px = SG.playerWorldX()/Main.TILES_SIZE;
-		int py = SG.playerWorldY()/Main.TILES_SIZE;
+		int height = SurvivalGame.WORLD_ROW;
+		int width = SurvivalGame.WORLD_COL;
+		int px = SG.getPlayer().getWorldX()/Main.TILES_SIZE;
+		int py = SG.getPlayer().getWorldY()/Main.TILES_SIZE;
 		map = new int[height][width];
 		/*Create border*/
 		for(int i = 0; i < height; i++){
@@ -113,8 +111,8 @@ public class SurvivalMap {
 		} 
 		
 		/*Clear area around fish*/
-		for(int i = Math.max(px - 2, 1); i <= Math.min(px + 2, width - 2); i++) {
-			for(int j = Math.max(py - 2, 1); j <= Math.min(py + 2, height - 2); j++) {
+		for(int i = Math.max(px - 2, 1); i <= Math.min(px + 2, height - 2); i++) {
+			for(int j = Math.max(py - 2, 1); j <= Math.min(py + 2, width - 2); j++) {
 				map[i][j] = 0;
 			}
 		}
@@ -183,8 +181,8 @@ public class SurvivalMap {
 		}
 	} 
 	private void loadRandomMap() {
-		for(int i = 0; i < SG.WORLD_ROW; i++) {
-			for(int j = 0; j < SG.WORLD_COL; j++) {
+		for(int i = 0; i < SurvivalGame.WORLD_ROW; i++) {
+			for(int j = 0; j < SurvivalGame.WORLD_COL; j++) {
 				if(map[i][j] >= 17)
 					tile[i][j] = map[i][j]; 
 				switch(map[i][j]) {
@@ -254,16 +252,16 @@ public class SurvivalMap {
 		return (code == 18);
 	}
 	/*Return code of next tiles (for straight movers) and replace item if necessary*/
-	public int[] traceMap(int[][] hitbox, int deltax, int deltay, boolean isConsumer) { 
+	public int[] traceMap(double[][] hitbox, double deltax, double deltay, boolean isConsumer) { 
 		//Top Left corner: ([0][0], [0][1])
 		//Bottom Right corner: ([1][0], [1][1])
-		int[] bottomLeft = {hitbox[0][0], hitbox[1][1]};
-		int[] topRight = {hitbox[1][0], hitbox[0][1]};
-		int[] middleUp = {(hitbox[0][0] + hitbox[1][0])/2, hitbox[0][1]}; 
-		int[] middleRight = {hitbox[1][0], (hitbox[0][1] + hitbox[1][1])/2};  
-		int[] middleBottom = {(hitbox[0][0] + hitbox[1][0])/2, hitbox[1][1]};
-		int[] middleLeft = {hitbox[0][0], (hitbox[0][1] + hitbox[1][1])/2};
-		int[][] corner = {hitbox[0], middleUp, topRight, middleRight, hitbox[1], middleBottom, bottomLeft, middleLeft};
+		double[] bottomLeft = {hitbox[0][0], hitbox[1][1]};
+		double[] topRight = {hitbox[1][0], hitbox[0][1]};
+		double[] middleUp = {(hitbox[0][0] + hitbox[1][0])/2, hitbox[0][1]}; 
+		double[] middleRight = {hitbox[1][0], (hitbox[0][1] + hitbox[1][1])/2};  
+		double[] middleBottom = {(hitbox[0][0] + hitbox[1][0])/2, hitbox[1][1]};
+		double[] middleLeft = {hitbox[0][0], (hitbox[0][1] + hitbox[1][1])/2};
+		double[][] corner = {hitbox[0], middleUp, topRight, middleRight, hitbox[1], middleBottom, bottomLeft, middleLeft};
 		int[] nextTile = new int[8];
 		for(int i = 0; i < 8; i++) {
 			nextTile[i] = traceTile(corner[i], deltax, deltay, isConsumer);
@@ -271,32 +269,43 @@ public class SurvivalMap {
 		return nextTile;
 	}
 	/*return code of touched lock & replace orb if necessary*/ 
-	private int traceTile(int[] coor, int deltax, int deltay, boolean isConsumer) { 
-		int[] currCoor = {coor[0] + deltax, coor[1] + deltay};
-		int[] currCoorTile = {currCoor[0]/Main.TILES_SIZE, currCoor[1]/Main.TILES_SIZE};
-		int code = tile[currCoorTile[1]][currCoorTile[0]];
-		if(isConsumer && tileIsConsumable(code)) {
-			replaceTileAt(currCoorTile[0], currCoorTile[1]);
+	private int traceTile(double[] coor, double deltax, double deltay, boolean isConsumer) { 
+		double[] deltaCoor = {coor[0] + deltax, coor[1] + deltay};
+		int[] tilePos = {(int)deltaCoor[0]/Main.TILES_SIZE, (int)deltaCoor[1]/Main.TILES_SIZE};
+		double[]  tileCoor = {tilePos[0]*Main.TILES_SIZE, tilePos[1]*Main.TILES_SIZE}; 
+		int code = tile[tilePos[1]][tilePos[0]];
+		if(tilePos[0] < 0 || tilePos[1] < 0 || 
+				tilePos[0] >= SurvivalGame.WORLD_COL|| tilePos[1] > SurvivalGame.WORLD_ROW) {
+			return 0;
 		}
-		//if(!isTrulyCollide(coor, currCoorTile) return -1;
+		 /*Check if point truly collide or not.*/
+		boolean flag1 = (tileCoor[0] + imgCode[code].solidArea.x <= deltaCoor[0]);
+		boolean flag2 = (deltaCoor[0] <= tileCoor[0] + imgCode[code].solidArea.x + imgCode[code].solidArea.width);
+		boolean flag3 = (tileCoor[1] + imgCode[code].solidArea.y <= deltaCoor[1]);
+		boolean flag4 = (deltaCoor[1] <= tileCoor[1] + imgCode[code].solidArea.y + imgCode[code].solidArea.height);
+		if(!(flag1 && flag2 && flag3 && flag4)) 
+			return 0;
+		if(isConsumer && tileIsConsumable(code)) {
+			replaceTileAt(tilePos[0], tilePos[1]);
+		}
 		return code;
 	}
 	private void replaceTileAt(int X, int Y) { /*column - row in matrix*/ 
 		int code = tile[Y][X];
-		visit.remove(Y*SG.WORLD_ROW + X);
-		voidTile.add(Y*SG.WORLD_ROW + X);
+		visit.remove(Y*SurvivalGame.WORLD_COL + X);
+		voidTile.add(Y*SurvivalGame.WORLD_COL + X);
 		tile[Y][X] = 0;
 		int rxc = voidTile.poll();
-		tile[rxc/SG.WORLD_ROW][rxc%SG.WORLD_COL] = code; 
+		tile[rxc/SurvivalGame.WORLD_COL][rxc%SurvivalGame.WORLD_COL] = code; 
 	}
 	public void render(Graphics2D g2) {
-		for(int i = 0; i < SG.WORLD_ROW; i++) {
-			for(int j = 0; j < SG.WORLD_COL; j++) {
+		for(int i = 0; i < SurvivalGame.WORLD_ROW; i++) {
+			for(int j = 0; j < SurvivalGame.WORLD_COL; j++) {
 				int code = tile[i][j];
 				int worldX = j*Main.TILES_SIZE;
 				int worldY = i*Main.TILES_SIZE;
-				int screenX = worldX - SG.playerWorldX() + SG.playerScreenX(); 
-				int screenY = worldY - SG.playerWorldY() + SG.playerScreenY();
+				int screenX = worldX - SG.getPlayer().getWorldX() + SG.getPlayer().getScreenX(); 
+				int screenY = worldY - SG.getPlayer().getWorldY() + SG.getPlayer().getScreenY();
 				if(screenX >= -5*Main.TILES_SIZE && screenY >= -5*Main.TILES_SIZE 
 					&& screenX <= Main.GAME_WIDTH + 5*Main.TILES_SIZE 
 					&& screenX <= Main.GAME_HEIGHT + 5*Main.TILES_SIZE) {
@@ -305,9 +314,6 @@ public class SurvivalMap {
 				}
 			}
 		}
-		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.25f));	
-		g2.drawImage(imgCode[99].image, 0, 0, 1000, 1000, null);
-		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 	}
 }
 

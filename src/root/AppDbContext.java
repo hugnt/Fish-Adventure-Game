@@ -8,11 +8,11 @@ import models.HintEntity;
 import models.LevelEntity;
 
 public class AppDbContext {
-	static String DRIVER_CLASS = "com.mysql.cj.jdbc.Driver";
+	static final String DRIVER_CLASS = "com.mysql.cj.jdbc.Driver";
 	static String DB_NAME = "fishadventure";
 	static String HOST_NAME = "localhost";
 	static String PORT;
-	static String DB_URL = "jdbc:mysql://localhost/fishadventure?serverTimezone=UTC";
+	static String DB_URL = "jdbc:mysql://localhost/fishadvanture?serverTimezone=UTC";
 	static String USER = "root";
 	static String PASS = "";
 	private ArrayList<LevelEntity> lvlEntity;
@@ -20,7 +20,7 @@ public class AppDbContext {
 	
 	public AppDbContext() throws SQLException, ClassNotFoundException {
 		
-		DRIVER_CLASS = IOHandler.getProperty("DRIVER_CLASS",Main.CONFIG_FILE).trim();
+//		DRIVER_CLASS = IOHandler.getProperty("DRIVER_CLASS",Main.CONFIG_FILE).trim();
 		HOST_NAME = IOHandler.getProperty("HOST_NAME",Main.CONFIG_FILE).trim();
 		PORT = IOHandler.getProperty("PORT",Main.CONFIG_FILE).trim();
 		DB_NAME = IOHandler.getProperty("DB_NAME",Main.CONFIG_FILE).trim();

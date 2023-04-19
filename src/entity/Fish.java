@@ -6,7 +6,6 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
-import main.Game;
 import main.Main;
 import root.IOHandler;
 import root.MoveHandler;
@@ -19,14 +18,12 @@ public class Fish{
 	private BufferedImage fishImgOri;
 	private BufferedImage fishImgFlip;
 	//Other Fish
-	private Fish otherFish;
 	
 	//move;
 	private boolean up = false;
 	private boolean right = false;
 	private boolean down = false;
 	private boolean left = false;
-	private boolean moving;
 	
 	//constant
 	private float denta = 1.5f;
@@ -56,7 +53,6 @@ public class Fish{
 		this.y = y;
 		this.width = width;
 		this.height = height;
-		moving = true;
 		
 		denta = denta*Float.parseFloat(IOHandler.getProperty("MOVE_STEP", Main.CONFIG_FILE).trim())*Main.SCALE;
 		
@@ -109,16 +105,8 @@ public class Fish{
 
 		//collision
 		if(moveHandler.isValidStep(hitbox.x + dentaX, hitbox.y + dentaY, hitbox.width, hitbox.height, mapData, unlock)) {
-			if(dentaX!=0||dentaY!=0) {
-				if(otherFish.isMoving() == true){
-					hitbox.x += dentaX;
-					hitbox.y += dentaY;
-				}
-				moving = true;
-			}
-		}
-		else {
-			moving = false;
+			hitbox.x += dentaX;
+			hitbox.y += dentaY;
 		}
 		
 	
@@ -151,15 +139,6 @@ public class Fish{
 		}
 		
 		
-	}
-
-	
-	public void setOtherFish(Fish otherFish) {
-		this.otherFish = otherFish;
-	}
-
-	public boolean isMoving() {
-		return moving;
 	}
 
 

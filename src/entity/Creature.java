@@ -8,15 +8,19 @@ public abstract class Creature {
 	protected SurvivalGame SG;
 	protected String species;
 	protected Rectangle hitbox;
-	protected int worldX, worldY;
-	Creature(SurvivalGame SG, int worldX, int worldY, String SP, Rectangle H) {
+	protected double worldX, worldY;
+	protected boolean isFren = true;
+	Creature(SurvivalGame SG, double worldX, double worldY, String SP, Rectangle H) {
 		this.SG = SG;
 		this.worldX = worldX;
 		this.worldY = worldY;
 		this.species = SP;
 		this.hitbox = H;
 	}
-	protected void draw(Graphics2D g2) {};
-	protected void update() {};
+	public void render(Graphics2D g2) {};
+	public void update() {};
+	public String getSpecies() {
+		return species;
+	}
 }
 
