@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 import entity.Fish;
 import main.Game;
+import main.Main;
 
 public class MoveHandler implements KeyListener {
 
@@ -63,18 +64,18 @@ public class MoveHandler implements KeyListener {
 
 	//check position
 	private boolean isValidPoint(float x, float y, int[][] mapData, boolean unlock) {
-		int maxWidth = mapData[0].length * Game.TILES_SIZE;
+		int maxWidth = mapData[0].length * Main.TILES_SIZE;
 		if(x < 0 || x >= maxWidth) {
-			//System.out.println("x OUT OF Width" + Game.GAME_WIDTH );
+			//System.out.println("x OUT OF Width" + Main.GAME_WIDTH );
 			return false;
 		}
-		if(y < 0 || y >= Game.GAME_HEIGHT) {
-			//System.out.println("y OUT OF Width" + Game.GAME_HEIGHT );
+		if(y < 0 || y >= Main.GAME_HEIGHT) {
+			//System.out.println("y OUT OF Width" + Main.GAME_HEIGHT );
 			return false;
 		}
 		//if both above are false => Inside the game window -> continue checking the details position
-		float xIndex = x / Game.TILES_SIZE;
-		float yIndex = y / Game.TILES_SIZE;
+		float xIndex = x / Main.TILES_SIZE;
+		float yIndex = y / Main.TILES_SIZE;
 		
 		int value = mapData[(int)yIndex][(int)xIndex];
 		
@@ -84,8 +85,8 @@ public class MoveHandler implements KeyListener {
 				float xFishA = fish.first;
 				float yFishA = fish.second;
 				
-				float xFishB = xFishA + 40* Game.SCALE;
-				float yFishC = yFishA + 26* Game.SCALE;
+				float xFishB = xFishA + 40* Main.SCALE;
+				float yFishC = yFishA + 26* Main.SCALE;
 				
 				if((x>=xFishA&&x<=xFishB)&&(y>=yFishA&&y<=yFishC)) {
 					touchFish = true;

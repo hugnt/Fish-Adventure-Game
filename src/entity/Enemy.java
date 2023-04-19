@@ -8,6 +8,7 @@ import java.util.ArrayList;
 
 
 import main.Game;
+import main.Main;
 import root.IOHandler;
 import root.MoveHandler;
 import root.Pair;
@@ -20,7 +21,7 @@ public class Enemy {
 	
 	
 	//constant
-	private float denta = 1.0f*Game.SCALE;
+	private float denta = 1.0f*Main.SCALE;
 	private float dentaX = 0;
 	private float dentaY = 0;
 	
@@ -56,16 +57,16 @@ public class Enemy {
 	}
 	
 	public void render(Graphics g, int xMapOffset) {
-		g.drawImage(enemyImg,(int)x - xMapOffset, (int)y, Game.TILES_SIZE, Game.TILES_SIZE, null);
+		g.drawImage(enemyImg,(int)x - xMapOffset, (int)y, Main.TILES_SIZE, Main.TILES_SIZE, null);
 		//g.setColor(Color.BLUE);
-		//g.drawRect((int)x - xMapOffset, (int)y, Game.TILES_SIZE, Game.TILES_SIZE);
+		//g.drawRect((int)x - xMapOffset, (int)y, Main.TILES_SIZE, Main.TILES_SIZE);
 	}
 	
 	public void updatePosition() {
 		//collision
 		if(dentaX>0) enemyImg = enemyImgOri;
 		else if(dentaX<0)  enemyImg = enemyImgFlip;
-		if(moveHandler.isValidStep(x + dentaX, y+dentaY,(float)Game.TILES_SIZE, (float)Game.TILES_SIZE-10*Game.SCALE, mapData, false)) {
+		if(moveHandler.isValidStep(x + dentaX, y+dentaY,(float)Main.TILES_SIZE, (float)Main.TILES_SIZE-10*Main.SCALE, mapData, false)) {
 			x += dentaX;
 			y += dentaY;
 		}

@@ -137,7 +137,7 @@ public class SurvivalFish extends Creature{
 			bip.first = false;
 			bip.second = 0;
 			SG.setDeathMessage("You got trapped.");
-			SG.end();
+			SG.setLose(true);
 		}
 		return bip;
 	}

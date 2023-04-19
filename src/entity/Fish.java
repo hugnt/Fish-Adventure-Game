@@ -35,8 +35,8 @@ public class Fish{
 	private MoveHandler moveHandler;
 	private Rectangle2D.Float hitbox;
 	private int[][] mapData;
-	private float xOffset = 20 * Game.SCALE;
-	private float yOffset = 12 * Game.SCALE;
+	private float xOffset = 20 * Main.SCALE;
+	private float yOffset = 12 * Main.SCALE;
 	
 	//Key lock 
 	private boolean unlock; 
@@ -58,9 +58,9 @@ public class Fish{
 		this.height = height;
 		moving = true;
 		
-		denta = denta*Float.parseFloat(IOHandler.getProperty("MOVE_STEP", Main.CONFIG_FILE).trim())*Game.SCALE;
+		denta = denta*Float.parseFloat(IOHandler.getProperty("MOVE_STEP", Main.CONFIG_FILE).trim())*Main.SCALE;
 		
-		hitbox = new Rectangle2D.Float(x - xOffset, y - yOffset, Game.TILES_DEFAULT_SIZE* Game.SCALE, 26* Game.SCALE);
+		hitbox = new Rectangle2D.Float(x - xOffset, y - yOffset, Main.TILES_DEFAULT_SIZE* Main.SCALE, 26* Main.SCALE);
 		
 		String fishColor = getFishColor(color);
 		fishImg = IOHandler.getImage(fishColor).getSubimage(12, 20, 40, 26);

@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 
 
 import main.Game;
+import main.Main;
 import root.IOHandler;
 
 public class Hint {
@@ -28,7 +29,7 @@ public class Hint {
 		this.height = height;
 		this.hint = hint;
 		hintDialog = IOHandler.getImage("popup.png");
-		font = IOHandler.getFont("RobotoMono-Regular.ttf").deriveFont(Font.PLAIN, 11*Game.SCALE);
+		font = IOHandler.getFont("RobotoMono-Regular.ttf").deriveFont(Font.PLAIN, 11*Main.SCALE);
 	
 	}
 	
@@ -56,9 +57,9 @@ public class Hint {
 
 	public void render(Graphics g, int xMapOffset) {
 	    if (showHint) {
-	        g.drawImage(hintDialog, x - xMapOffset, y - Game.TILES_SIZE * 3, (int)(width*5*Game.SCALE), (int)(height*3*Game.SCALE), null);
+	        g.drawImage(hintDialog, x - xMapOffset, y - Main.TILES_SIZE * 3, (int)(width*5*Main.SCALE), (int)(height*3*Main.SCALE), null);
 	        g.setFont(font);
-	        drawQuestion(g, hint, (int)(x - xMapOffset+Game.TILES_SIZE * 0.7),(int)(y - Game.TILES_SIZE * 2+Game.TILES_SIZE * 0.4), (int)(width*5*Game.SCALE-Game.TILES_SIZE * 0.7));
+	        drawQuestion(g, hint, (int)(x - xMapOffset+Main.TILES_SIZE * 0.7),(int)(y - Main.TILES_SIZE * 2+Main.TILES_SIZE * 0.4), (int)(width*5*Main.SCALE-Main.TILES_SIZE * 0.7));
 	    }
 	}
 

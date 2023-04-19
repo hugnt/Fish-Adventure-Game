@@ -30,6 +30,7 @@ public class PauseMenu extends Menu{
 	private JDialog pauseDialog;
 
 	public PauseMenu(SurvivalGame game) {
+	
 		pauseDialog = new JDialog();
 		pauseDialog.setModal(true);
 		
@@ -62,8 +63,8 @@ public class PauseMenu extends Menu{
         	@Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_P) {
-                    setRunning(false);
-                    SKeyHandler.paused = false;
+                	running = false;
+                	pauseDialog.setVisible(false);
                     SKeyHandler.RESET();
                 }
             }
@@ -75,11 +76,11 @@ public class PauseMenu extends Menu{
         btnRestart.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				setRunning(false);
 				game.end();
 				game.start();
-				pauseDialog.setVisible(false);
 				game.requestFocus();
-				
+				SKeyHandler.RESET();
 			}
 		});
         
@@ -191,6 +192,10 @@ public class PauseMenu extends Menu{
 		this.running = running;
 		pauseDialog.setVisible(running);
 	}
+	public boolean getRunning() {
+		return running;
+	}
+
 
 	@Override
 	public JPanel getMenuPanel() {

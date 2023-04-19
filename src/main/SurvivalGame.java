@@ -13,6 +13,8 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.rmi.server.Skeleton;
@@ -39,13 +41,21 @@ public class SurvivalGame extends JPanel implements Runnable{ //Panel + Thread
 	
 	//game status
 	private boolean lose;
-	PauseMenu pauseMenu;
+	
 	
 	public SurvivalGame(){
 		Main.STARTPANEL.setVisible(false);
 		Main.SCREEN.getScreen().add(this);
-		
-		
+		PauseMenu pauseMenu= new PauseMenu(this);
+		pauseMenu.setRunning(false);
+        this.addKeyListener(new KeyAdapter() {
+        	@Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_P) {
+                	pauseMenu.setRunning(!pauseMenu.getRunning());
+                }
+            }
+		});
 		//player.giveInvincibility((long)10e9);
 		this.requestFocusInWindow();
 		this.requestFocus();
@@ -53,17 +63,16 @@ public class SurvivalGame extends JPanel implements Runnable{ //Panel + Thread
 		this.setBackground(Color.black);
 		this.addKeyListener(new SKeyHandler());
 		this.setFocusable(true); //game panel can be focused to receive key input
-		start();
+	
 	}
 
 	//Private methods
 	public void start() {
-		gameOver = false;
+		lose = false;
 		//pause menu
-		pauseMenu = new PauseMenu(this);
-        pauseMenu.setRunning(false);
-        
+	
         //other 
+        SKeyHandler.RESET();
 		player = new SurvivalFish(this, WORLD_WIDTH/2, WORLD_HEIGHT/2);
 		goldfish = new Goldfish(this, WORLD_WIDTH/2, WORLD_HEIGHT/2, 0.03);
 		smap = new SurvivalMap(this, 0.15, 0.05, 0.1, 0.05, 0.01);
@@ -76,41 +85,23 @@ public class SurvivalGame extends JPanel implements Runnable{ //Panel + Thread
 		double delta = 0;
 		long lastTime = System.nanoTime();
 		long currentTime;
-		while(true) {
+		while(true&&!gameThread.isInterrupted()) {
+			if(lose) {
+				lose= false;
+			    ResultMenu resMenu = new ResultMenu(this);
+				resMenu.setRunning(true);	
+		
+				break;
+			};
 			currentTime = System.nanoTime();
-			if(!SKeyHandler.paused) {
-				//player.resumeAllEffects();
-				/*Exit JDialog*/
-				delta += (currentTime - lastTime)/drawInterval;
-				if(delta >= 1) {
-					update();
-					if(gameOver||gameThread.isInterrupted()) {
-					    ResultMenu resMenu = new ResultMenu(this);
-						resMenu.setRunning(true);	
-						break;
-					};
-					repaint();
-					delta--;
-				}
-			}
-			else {
-				pauseMenu.setRunning(SKeyHandler.paused);
-				//player.pauseAllEffects();
-				/*Open JDialog
-				 * Volume bar
-				 * Sound bar
-				 * "Continue game"
-				 * "Menu" 
-				 */
+			delta += (currentTime - lastTime)/drawInterval;
+			if(delta >= 1) {
+				update();
+				repaint();
+				delta--;
 			}
 			lastTime = currentTime;
 		}	
-		/*JDialog
-		 * Death Message from player.deathMessage
-		 * "Your name:" --> Save Name & Point on DB
-		 * "New game"
-		 * "Menu"
-		 * */ 
 	}
 	public void update() {
 		player.update();
@@ -179,14 +170,17 @@ public class SurvivalGame extends JPanel implements Runnable{ //Panel + Thread
 	}
 	//Set methods
 	public void end() {
-		SKeyHandler.RESET();
 		gameThread.interrupt();
-		gameOver = true;
-	}
-	public void setState() {
-		GamePaused = !GamePaused;
+		setIgnoreRepaint(true);
+		removeAll();
+		
 	}
 	
+	
+
+	public void setLose(boolean lose) {
+		this.lose = lose;
+	}
 
 	public boolean isLose() {
 		return lose;

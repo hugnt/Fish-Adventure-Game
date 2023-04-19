@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
 import main.Game;
+import main.Main;
 import root.IOHandler;
 import root.Pair;
 
@@ -103,8 +104,8 @@ public class Atlas {
 						index = 6;
 					}
 				}
-				g.drawImage(mapSprites[index], Game.TILES_SIZE * j - xMapOffset , Game.TILES_SIZE * i,
-							Game.TILES_SIZE, Game.TILES_SIZE,null);
+				g.drawImage(mapSprites[index], Main.TILES_SIZE * j - xMapOffset , Main.TILES_SIZE * i,
+							Main.TILES_SIZE, Main.TILES_SIZE,null);
 			}
 		}
 		

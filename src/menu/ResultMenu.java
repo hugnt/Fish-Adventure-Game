@@ -66,12 +66,9 @@ public class ResultMenu extends Menu{
         btnRestart.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				game.end();
-				resDialog.setVisible(false);
 				setRunning(false);
-
+				game.end();
 				game.start();
-				
 				game.requestFocus();
 				
 			}
@@ -80,8 +77,8 @@ public class ResultMenu extends Menu{
         btnExitToMenu.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				game.end();
 				resDialog.setVisible(false);
+				game.end();
 				game.setVisible(false);
 				Main.STARTPANEL.setVisible(true);
 			}

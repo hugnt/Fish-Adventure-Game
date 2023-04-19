@@ -12,6 +12,7 @@ import javax.swing.JTextField;
 import javax.swing.border.Border;
 
 import main.Game;
+import main.Main;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -60,7 +61,7 @@ public class Lock {
 		//label
 		label = new JLabel();
 		label.setText("Enter password ("+currTyping+"/"+limitTyping+")"+" :");
-		Font font = new Font("Arial", Font.PLAIN, (int)(11*Game.SCALE));
+		Font font = new Font("Arial", Font.PLAIN, (int)(11*Main.SCALE));
 		label.setPreferredSize(new Dimension(width, (int)((height-10)/3)));
 		label.setFont(font);
 		

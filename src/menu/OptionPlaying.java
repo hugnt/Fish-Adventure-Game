@@ -76,6 +76,7 @@ public class OptionPlaying extends Menu{
 			@Override
 			public void actionPerformed(ActionEvent e) {
             	game2 = new SurvivalGame();
+            	game2.start();
 			}
 		});
 		

@@ -49,23 +49,14 @@ public class Game implements Runnable {
 	private boolean lose;
 	private boolean touchEnemy;
 	
-
 	// config game
-	public static int TILES_DEFAULT_SIZE;
-	public static float SCALE;
-	public static int TILES_IN_WIDTH;
-	public final static int TILES_IN_HEIGHT = 22;
-	public static int TILES_SIZE;
-	public static int GAME_WIDTH;
-	public static int GAME_HEIGHT;
 
 	// Events
 	private MoveHandler movingEvent;
 
 	// display thread
 	private Thread displayThread;
-	private int FPS_SET;
-
+	
 	// Extend map
 	private int xMapOffset = 0;
 	private int leftBorder;
@@ -80,10 +71,10 @@ public class Game implements Runnable {
 	private ArrayList<HintEntity> hintEntity;
 
 	public Game() {
-		importGameConfig();
+		importGameProps();
 		lvlMenu = new LevelMenu(this);
    
-		panel = new Panel(this, GAME_WIDTH, GAME_HEIGHT);// create panel
+		panel = new Panel(this, Main.GAME_WIDTH, Main.GAME_HEIGHT);// create panel
 		Main.STARTPANEL.setVisible(false);
 		Main.SCREEN.getScreen().add(panel);
 		
@@ -150,39 +141,24 @@ public class Game implements Runnable {
 
 	}
 
-	private void importGameConfig() {
-		TILES_DEFAULT_SIZE = Integer.parseInt(IOHandler.getProperty("TILES_DEFAULT_SIZE", Main.CONFIG_FILE).trim());
-		SCALE = Float.parseFloat(IOHandler.getProperty("SCALE", Main.CONFIG_FILE).trim());
-		TILES_IN_WIDTH = Integer.parseInt(IOHandler.getProperty("TILES_IN_WIDTH", Main.CONFIG_FILE).trim());
-		TILES_SIZE = (int) (TILES_DEFAULT_SIZE * SCALE);
-		GAME_WIDTH = TILES_SIZE * TILES_IN_WIDTH;
-		GAME_HEIGHT = TILES_SIZE * TILES_IN_HEIGHT;
-		FPS_SET = Integer.parseInt(IOHandler.getProperty("FPS_SET", Main.CONFIG_FILE).trim());
-		
+	private void importGameProps() {
 		lastLevel = Integer.parseInt(IOHandler.getProperty("LAST_LEVEL_PLAYING",Main.UPDATE_FILE).trim());		
-		leftBorder = (int) (0.4 * GAME_WIDTH);
-		rightBorder = (int) (0.6 * GAME_WIDTH);
+		leftBorder = (int) (0.4 * Main.GAME_WIDTH);
+		rightBorder = (int) (0.6 * Main.GAME_WIDTH);
 		
 		lvlEntity = new ArrayList<LevelEntity>();
 		hintEntity = new ArrayList<HintEntity>();
 		
 		//Import data from MySQL
-		try {
-			AppDbContext _dbContext = new AppDbContext();
-			lvlEntity = _dbContext.getLvlEntity();
-			hintEntity = _dbContext.getHintEntity();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-				
+		lvlEntity = Main.DBContext.getLvlEntity();
+		hintEntity = Main.DBContext.getHintEntity();
+		
 		
 	}
 
 	private void initCharacter() {
-		fish1 = new Fish(TILES_SIZE * 2, TILES_SIZE * 6, 64 * SCALE, 64 * SCALE, "red");
-		fish2 = new Fish(TILES_SIZE * 2, TILES_SIZE * 16, 64 * SCALE, 64 * SCALE, "blue");
+		fish1 = new Fish(Main.TILES_SIZE * 2, Main.TILES_SIZE * 6, 64 * Main.SCALE, 64 * Main.SCALE, "red");
+		fish2 = new Fish(Main.TILES_SIZE * 2, Main.TILES_SIZE * 16, 64 * Main.SCALE, 64 * Main.SCALE, "blue");
 		fish1.setOtherFish(fish2);
 		fish2.setOtherFish(fish1);
 		fish1.setMapData(map.getMapData());
@@ -202,8 +178,8 @@ public class Game implements Runnable {
 		int i = 0;
 		for (var posHint : lstPosHint) {
 			memHint.put(posHint, i);
-			lstHint.add(new Hint(TILES_SIZE * posHint.first, TILES_SIZE * posHint.second,
-					TILES_SIZE, TILES_SIZE, lstHintContent.get(i)));
+			lstHint.add(new Hint(Main.TILES_SIZE * posHint.first, Main.TILES_SIZE * posHint.second,
+					Main.TILES_SIZE, Main.TILES_SIZE, lstHintContent.get(i)));
 			i++;
 		}
 	}
@@ -212,7 +188,7 @@ public class Game implements Runnable {
 		String key1 = lvlEntity.get(currentLevel-1).getKeyAnswer();
 		String key2 = lvlEntity.get(currentLevel-1).getKeyAnswer2();
 		int limitTyping =  lvlEntity.get(currentLevel-1).getLimitTyping();
-		lock = new Lock(TILES_SIZE * map.getPosLockX(), TILES_SIZE * map.getPosLockY(), TILES_SIZE * 4, TILES_SIZE * 2,
+		lock = new Lock(Main.TILES_SIZE * map.getPosLockX(), Main.TILES_SIZE * map.getPosLockY(), Main.TILES_SIZE * 4, Main.TILES_SIZE * 2,
 				key1, key2, limitTyping);
 		
 		panel.add(lock.getPasswordPanel());
@@ -226,13 +202,13 @@ public class Game implements Runnable {
         var lstPosOcto = map.getLstPosOcto();
         var lstPosGrid = map.getLstPosGrid();
         for(var c : lstPosCrab) 
-        	enemy.add(new Enemy(TILES_SIZE *c.first, TILES_SIZE *c.second, 410, 410, "crab.png", true));
+        	enemy.add(new Enemy(Main.TILES_SIZE *c.first, Main.TILES_SIZE *c.second, 410, 410, "crab.png", true));
        
        for(var o : lstPosOcto) 
-        	enemy.add(new Enemy(TILES_SIZE *o.first, TILES_SIZE *o.second, 728, 728, "octopus.png", true));
+        	enemy.add(new Enemy(Main.TILES_SIZE *o.first, Main.TILES_SIZE *o.second, 728, 728, "octopus.png", true));
        
        for(var g : lstPosGrid)
-    	   	enemy.add(new Enemy(TILES_SIZE *g.first, TILES_SIZE *g.second, 560, 560, "grid.png", false));
+    	   	enemy.add(new Enemy(Main.TILES_SIZE *g.first, Main.TILES_SIZE *g.second, 560, 560, "grid.png", false));
        
        	touchEnemy = false;
 	}
@@ -243,7 +219,7 @@ public class Game implements Runnable {
 		btnPause.setFocusPainted(false);
         btnPause.setOpaque(false);
         btnPause.setForeground(new Color(18,219,242,255));
-        btnPause.setBounds((int)(GAME_WIDTH-TILES_SIZE*1.5),(int)(TILES_SIZE/3), TILES_SIZE, TILES_SIZE);
+        btnPause.setBounds((int)(Main.GAME_WIDTH-Main.TILES_SIZE*1.5),(int)(Main.TILES_SIZE/3), Main.TILES_SIZE, Main.TILES_SIZE);
         btnPause.setFont(fontBtn);
         btnPause.setBackground(new Color(41,171,226,255));
         btnPause.setBorder(BorderFactory.createLineBorder(new Color(18,219,242,255), 2));
@@ -316,8 +292,8 @@ public class Game implements Runnable {
 
 	private void extendMap() {
 		int mapTilesWide = map.getMapData()[0].length;
-		int maxTilesOffset = mapTilesWide - TILES_IN_WIDTH;
-		int maxMapOffsetX = maxTilesOffset * TILES_SIZE;
+		int maxTilesOffset = mapTilesWide - Main.TILES_IN_WIDTH;
+		int maxMapOffsetX = maxTilesOffset * Main.TILES_SIZE;
 
 		int fishPosX = (int) fish1.getHitbox().x;
 		int diff = fishPosX - xMapOffset;
@@ -335,7 +311,7 @@ public class Game implements Runnable {
 
 	@Override
 	public void run() {
-		double timePerFrame = 1000000000.0 / FPS_SET;
+		double timePerFrame = 1000000000.0 / Main.FPS_SET;
 		long previousTime = System.nanoTime();
 
 		int frames = 0;
