@@ -26,8 +26,6 @@ public class Pair<T, U> {
 			return false;
 		Pair other = (Pair) obj;
 		return Objects.equals(first, other.first) && Objects.equals(second, other.second);
-	}
-
-       
+	}       
   
 }

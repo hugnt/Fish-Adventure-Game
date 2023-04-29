@@ -11,7 +11,7 @@ public class Screen {
 
 	public Screen(Panel panel) {
 		screen = new JFrame();
-		screen.setTitle("Fish Advanture Game");
+		screen.setTitle("Fish Adventure Game");
 		ImageIcon icon = new ImageIcon(IOHandler.getImage("icon.png"));
 		screen.setIconImage(icon.getImage());
 		screen.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);//terminated window 
@@ -26,7 +26,4 @@ public class Screen {
 		return screen;
 	}
 
-
-
-	
 }

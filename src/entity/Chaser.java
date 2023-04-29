@@ -23,7 +23,7 @@ public class Chaser extends Creature{
 	}
 	public void update() {
 		if(endRestTime < System.nanoTime()) {
-			if(distanceToPlayer() <= 9*Main.TILES_SIZE) {
+			if(distanceToPlayer() <= 8*Main.TILES_SIZE) {
 				desX = 2*SG.getPlayer().getWorldX() - worldX;
 				desY = 2*SG.getPlayer().getWorldY() - worldY;
 			}
@@ -67,3 +67,5 @@ public class Chaser extends Creature{
 			else g2.drawImage(rightImg, screenX, screenY, (int)(Main.TILES_SIZE *1.5) , (int)(Main.TILES_SIZE *1.5), null);
 	}
 }
+
+

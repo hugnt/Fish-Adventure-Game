@@ -4,6 +4,8 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 import main.*;
 import root.*;
+
+
 public class Spawner {
 	private ArrayList<Creature> creatures;
 	public Spawner(SurvivalGame SG, double bladePerc, double blueGuardPerc, double chaserPerc){
@@ -58,3 +60,5 @@ public class Spawner {
 		}
 	}
 }
+
+

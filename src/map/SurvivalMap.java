@@ -48,7 +48,7 @@ public class SurvivalMap {
 		imgCode = new Tile[30];
 		tile = new int[SurvivalGame.WORLD_ROW][SurvivalGame.WORLD_COL];
 		loadSprite();
-		createRandomness(obsPerc, orbPerc, decoPerc, trapPerc, altObsPerc); //Generate random map & datastructure for random placement of orbs
+		createRandomness(obsPerc, orbPerc, decoPerc, trapPerc, altObsPerc);
 		loadRandomMap();
 	}
 	private void loadSprite() {
@@ -85,6 +85,15 @@ public class SurvivalMap {
 		
 		imgCode[22] = new Tile();
 		imgCode[22].image = img.getSubimage(6*512, 6*512, 512, 512);
+	}
+	public boolean tileIsConsumable(int code) {
+		return (code == 19);
+	}
+	public boolean tileIsMoveable(int code) {
+		return (code == 0 || code >= 19);
+	}
+	public boolean tileIsTrap(int code) {
+		return (code == 18);
 	}
 	private void createRandomness(double obsPerc, double orbPerc, double decoPerc, double trapPerc, double altObsPerc){
 		int height = SurvivalGame.WORLD_ROW;
@@ -153,7 +162,7 @@ public class SurvivalMap {
 			int col = top%(width);
 			for(int []dir: dirArr) {
 				if(row + dir[0] >= 0 && row + dir[0] < height && col + dir[1] >= 0 && col + dir[1] < width
-				   && (map[row + dir[0]][col + dir[1]] == 0 || map[row + dir[0]][col + dir[1]] >= 20)
+				   && tileIsMoveable(map[row + dir[0]][col + dir[1]])
 				   && !visit.contains((row + dir[0])*width + col + dir[1])) {
 					visit.add((row + dir[0])*width + col + dir[1]);
 					qu.add((row + dir[0])*width + col + dir[1]);
@@ -241,17 +250,6 @@ public class SurvivalMap {
 			}
 		}
 	}
-	/*Check map's code*/
-	public boolean tileIsConsumable(int code) {
-		return (code == 19);
-	}
-	public boolean tileIsMoveable(int code) {
-		return (code == 0 || code >= 19);
-	}
-	public boolean tileIsTrap(int code) {
-		return (code == 18);
-	}
-	/*Return code of next tiles (for straight movers) and replace item if necessary*/
 	public int[] traceMap(double[][] hitbox, double deltax, double deltay, boolean isConsumer) { 
 		//Top Left corner: ([0][0], [0][1])
 		//Bottom Right corner: ([1][0], [1][1])
@@ -268,16 +266,15 @@ public class SurvivalMap {
 		}
 		return nextTile;
 	}
-	/*return code of touched lock & replace orb if necessary*/ 
 	private int traceTile(double[] coor, double deltax, double deltay, boolean isConsumer) { 
 		double[] deltaCoor = {coor[0] + deltax, coor[1] + deltay};
 		int[] tilePos = {(int)deltaCoor[0]/Main.TILES_SIZE, (int)deltaCoor[1]/Main.TILES_SIZE};
 		double[]  tileCoor = {tilePos[0]*Main.TILES_SIZE, tilePos[1]*Main.TILES_SIZE}; 
-		int code = tile[tilePos[1]][tilePos[0]];
 		if(tilePos[0] < 0 || tilePos[1] < 0 || 
 				tilePos[0] >= SurvivalGame.WORLD_COL|| tilePos[1] > SurvivalGame.WORLD_ROW) {
 			return 0;
 		}
+		int code = tile[tilePos[1]][tilePos[0]];
 		 /*Check if point truly collide or not.*/
 		boolean flag1 = (tileCoor[0] + imgCode[code].solidArea.x <= deltaCoor[0]);
 		boolean flag2 = (deltaCoor[0] <= tileCoor[0] + imgCode[code].solidArea.x + imgCode[code].solidArea.width);
@@ -308,7 +305,7 @@ public class SurvivalMap {
 				int screenY = worldY - SG.getPlayer().getWorldY() + SG.getPlayer().getScreenY();
 				if(screenX >= -5*Main.TILES_SIZE && screenY >= -5*Main.TILES_SIZE 
 					&& screenX <= Main.GAME_WIDTH + 5*Main.TILES_SIZE 
-					&& screenX <= Main.GAME_HEIGHT + 5*Main.TILES_SIZE) {
+					&& screenY <= Main.GAME_HEIGHT + 5*Main.TILES_SIZE) {
 					int sz = (int)((Main.TILES_DEFAULT_SIZE + PADD)*Main.SCALE);
 					g2.drawImage(imgCode[code].image, screenX, screenY, sz, sz, null);
 				}

@@ -30,8 +30,9 @@ public class BlueGuard extends Creature {
 		int screenY = (int)worldY - SG.getPlayer().getWorldY() + SG.getPlayer().getScreenY();
 		if(screenX >= -5*Main.TILES_SIZE && screenY >= -5*Main.TILES_SIZE 
 			&& screenX <= Main.GAME_WIDTH + 5*Main.TILES_SIZE 
-			&& screenX <= Main.GAME_HEIGHT + 5*Main.TILES_SIZE)
+			&& screenY <= Main.GAME_HEIGHT + 5*Main.TILES_SIZE)
 			g2.drawImage(image, screenX, screenY, (int)(Main.TILES_SIZE *1.5) , (int)(Main.TILES_SIZE *1.5), null); //orriginal size
 			
 	}
 }
+

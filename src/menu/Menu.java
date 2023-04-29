@@ -30,6 +30,4 @@ public abstract class Menu {
 	abstract public JPanel getMenuPanel();
 	
 	abstract public void setMenuPanel(JPanel menuPanel);
-	
-	
 }

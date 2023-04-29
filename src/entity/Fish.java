@@ -89,7 +89,7 @@ public class Fish{
 	public void updatePosition() {
 		//moving = true;
 		float dentaX = 0, dentaY = 0;
-		
+//		dentaY +=denta/2;
 		if (left && !right) {
 			dentaX -= denta;
 			fishImg = fishImgFlip;

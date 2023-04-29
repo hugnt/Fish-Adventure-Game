@@ -9,7 +9,6 @@ public abstract class Creature {
 	protected String species;
 	protected Rectangle hitbox;
 	protected double worldX, worldY;
-	protected boolean isFren = true;
 	Creature(SurvivalGame SG, double worldX, double worldY, String SP, Rectangle H) {
 		this.SG = SG;
 		this.worldX = worldX;

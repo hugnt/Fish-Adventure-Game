@@ -19,7 +19,7 @@ import root.IOHandler;
 public class StartMenu extends Menu {
 	private final Dimension PANEL_SIZE = new Dimension(BUTTON_SIZE.width*2, BUTTON_SIZE.height*4+GAP_BETWEEN_BUTTON.height*5);
 	private Font fontTitle;
-	private final String gameName = "FISH ADVANTURE";
+	private final String gameName = "FISH ADVENTURE";
 	private BufferedImage fish1, fish2, intro;
 	private final int fishSize = Main.TILES_SIZE*6;
 	

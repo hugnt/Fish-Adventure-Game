@@ -10,18 +10,18 @@ import main.SurvivalGame;
 import root.*;
 
 public class SurvivalFish extends Creature{
-	private long endInvin; //Stack
 	private BufferedImage rightImg, leftImg;
 	private String deathMessage = "";
+	private double speed;
+	private long endInvin; //Stack
 	private int screenX, screenY;
-	private int speed;
-	private int point;
+	private int point;	
 	private boolean left;
 	public SurvivalFish(SurvivalGame SG, int worldX, int worldY) {
 		super(SG, worldX, worldY, "Struggler", new Rectangle(0, 0, (int)(30*Main.SCALE), (int)(22*Main.SCALE)));
 		screenX = Main.GAME_WIDTH/2 - Main.TILES_SIZE/2;
 		screenY = Main.GAME_HEIGHT/2 - Main.TILES_SIZE/2;
-		speed = (int)(4*Main.SCALE);
+		speed = 3*Main.SCALE;
 		point = 0;
 		left = true; 
 		getPlayerImage();
@@ -39,8 +39,7 @@ public class SurvivalFish extends Creature{
 		double[] delta = new double[2];
 		Pair<Boolean, Integer> bip = new Pair<Boolean, Integer>(false, 0); 
 		int newPoint = 0;
-		if(SKeyHandler.shiftPressed) speed = (int)(speed*1.5);
-		/*Check collision with other creatures*/
+		if(SKeyHandler.shiftPressed) speed = speed*1.25;
 		if(endInvin < System.nanoTime()) { 
 			String killer = SG.getSpawner().traceOnSpawner(corner);
 			if(killer != "NN") {
@@ -48,15 +47,10 @@ public class SurvivalFish extends Creature{
 				SG.getPlayer().setDeathMessage("You got killed by " + killer);
 			}
 		}
-		//Check collision with tiles
-		if(SKeyHandler.leftPressed)
-			delta[0] -= speed;
-		else if(SKeyHandler.rightPressed)
-			delta[0] += speed;
-		if(SKeyHandler.upPressed)
-			delta[1] -= speed;
-		else if(SKeyHandler.downPressed) 
-			delta[1] += speed;
+		if(SKeyHandler.leftPressed) delta[0] -= speed;
+		else if(SKeyHandler.rightPressed) delta[0] += speed;
+		if(SKeyHandler.upPressed) delta[1] -= speed;
+		else if(SKeyHandler.downPressed) delta[1] += speed;
 		nextTile = SG.getMap().traceMap(corner, delta[0], 0, true);
 		if(delta[0] < 0) {
 			left = true;
@@ -91,16 +85,15 @@ public class SurvivalFish extends Creature{
 		}
 		worldX += delta[0];
 		worldY += delta[1];
-		if(SG.getGoldfish().distanceToPlayer() < 5*Main.TILES_SIZE) {
+		if(SG.getGoldfish().distanceToPlayer() < 8*Main.TILES_SIZE) {
 			newPoint *= 2;
 		}
 		if((this.point + newPoint)/100 > this.point/100) {
-			endInvin = (long) Math.max(endInvin + 10e9, System.nanoTime() + 10e9);
+			endInvin = (long) Math.max(endInvin + 10.1e9, System.nanoTime() + 10.1e9);
 		}
 		this.point += newPoint;
-		if(SKeyHandler.shiftPressed) speed = (int)(speed/1.5);
+		if(SKeyHandler.shiftPressed) speed = speed/1.25;
 	}
-	/*private method for update: return collision & point*/ 
 	private Pair<Boolean, Integer> checkTile(int code) {
 		Pair<Boolean, Integer> bip = new Pair<Boolean, Integer>(false, 0);
 		if(SG.getMap().tileIsConsumable(code)) {
@@ -131,7 +124,6 @@ public class SurvivalFish extends Creature{
 		g2.drawImage(image, screenX, screenY, (int)(40*Main.SCALE), (int)(26*Main.SCALE), null); //orriginal size
 		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
 	}
-	/*Get set methods*/
 	public int getWorldX() {
 		return (int)worldX;
 	}
@@ -154,6 +146,6 @@ public class SurvivalFish extends Creature{
 		return point;
 	}
 	public void giveInvincibility(long nanosecond) { //stacked
-		 endInvin = (long) Math.max(endInvin + 10e9, System.nanoTime() + 10e9);
+		 endInvin = (long) Math.max(endInvin + nanosecond, System.nanoTime() + nanosecond);
 	}
 }

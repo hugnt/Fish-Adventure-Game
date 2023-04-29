@@ -15,37 +15,37 @@ import map.SurvivalMap;
 import menu.PauseMenu;
 import menu.ResultMenu;
 
-
-public class SurvivalGame extends JPanel implements Runnable{ //Panel + Thread
-	public static final int WORLD_COL = (int)(50*Main.SCALE);
-	public static final int WORLD_ROW = (int)(50*Main.SCALE);
+public class SurvivalGame extends JPanel implements Runnable{ 
+	public static final int WORLD_COL = 50;
+	public static final int WORLD_ROW = 50;
 	public static final int WORLD_WIDTH = (int)(Main.TILES_SIZE * WORLD_COL);
 	public static final int WORLD_HEIGHT = (int)(Main.TILES_SIZE * WORLD_ROW);
-	public static final int FPS_SET = (int)(Main.FPS_SET*0.5);
+	public static final int FPS_SET = Main.FPS_SET;
 	private static final double OBS_PERCENTAGE = 0.15;
 	private static final double ORB_PERCENTAGE = 0.05;
-	private static final double BLADE = 0.0036;//0.0036;
-	private static final double BLUE_GUARD = 0.0036;//;0.0036;
-	private static final double CHASER = 0.0027;//0.0027;
+	private static final double BLADE = 0.003;
+	private static final double BLUE_GUARD = 0.003;
+	private static final double CHASER = 0.0025;
+	private BufferedImage backgroundImg;
+	private Thread gameThread;
 	private SurvivalFish player;
 	private Goldfish goldfish;
 	private Spawner spawner;
 	private SurvivalMap survivalMap;
-	private Thread gameThread;
 	private boolean lose;
-	private BufferedImage backgroundImg;
 	private boolean gamePaused;
 	public SurvivalGame(){
-		Main.STARTPANEL.setVisible(false);
+ 		Main.STARTPANEL.setVisible(false);
 		Main.SCREEN.getScreen().add(this);
 		PauseMenu pauseMenu= new PauseMenu(this);
 		pauseMenu.setRunning(false);
+
         this.addKeyListener(new KeyAdapter() {
         	@Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_P) {
                 	gamePaused = true;
-                	pauseMenu.setRunning(!pauseMenu.getRunning());
+                	pauseMenu.setRunning(true);
                 }
             }
 		});
@@ -55,14 +55,13 @@ public class SurvivalGame extends JPanel implements Runnable{ //Panel + Thread
 		this.setBackground(Color.black);
 		this.addKeyListener(new SKeyHandler());
 		this.setFocusable(true);
-	
 	}
 	public void start() {
 		lose = false;
         SKeyHandler.RESET();
         backgroundImg = IOHandler.getImage("water.png");
 		player = new SurvivalFish(this, WORLD_WIDTH/2, WORLD_HEIGHT/2);
-		player.giveInvincibility((long)10e9);
+		player.giveInvincibility((long)11e9);
 		goldfish = new Goldfish(this, WORLD_WIDTH/2, WORLD_HEIGHT/2, 0.03);
 		survivalMap = new SurvivalMap(this, OBS_PERCENTAGE, ORB_PERCENTAGE, 0.1, 0.05, 0.01);
 		spawner = new Spawner(this, BLADE, BLUE_GUARD, CHASER);
@@ -81,7 +80,7 @@ public class SurvivalGame extends JPanel implements Runnable{ //Panel + Thread
 				continue;
 			}
 			if(lose) {
-				lose = false;
+				//lose = false;
 			    ResultMenu resMenu = new ResultMenu(this);
 				resMenu.setRunning(true);	
 				break;
@@ -113,8 +112,6 @@ public class SurvivalGame extends JPanel implements Runnable{ //Panel + Thread
 	    g2.setColor(Color.WHITE);
 	    g2.drawString("Point: " + player.getPoint(), Main.TILES_SIZE, Main.TILES_SIZE);
 	}
-	
-	/*Get set method*/
 	public SurvivalFish getPlayer() {
 		return player;
 	}
@@ -132,11 +129,11 @@ public class SurvivalGame extends JPanel implements Runnable{ //Panel + Thread
 		setIgnoreRepaint(true);
 		removeAll();
 	}
-	public boolean isLose() {
-		return lose;
-	}
 	public void setLose(boolean lose) {
 		this.lose = lose;
+	}
+	public boolean isLose() {
+		return lose;
 	}
 	public void setPauseGame(boolean pause) {
 		gamePaused = pause;
